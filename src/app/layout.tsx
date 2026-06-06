@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { AppProviders } from "@/components/providers/AppProviders";
+import { APP_DESCRIPTION, APP_NAME } from "@/lib/brand";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,10 +15,23 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Evde Ne Var? | Akıllı Mutfak Asistanı",
-  description:
-    "Mutfak stoklarınızı yönetin, SKT takibi yapın ve eldeki malzemelerle AI destekli tarifler alın.",
-  applicationName: "Evde Ne Var?",
+  title: {
+    default: `${APP_NAME} | Akıllı Tarif Asistanı`,
+    template: `%s | ${APP_NAME}`,
+  },
+  description: APP_DESCRIPTION,
+  applicationName: APP_NAME,
+  icons: {
+    icon: [{ url: "/icon.png", type: "image/png" }],
+    apple: [{ url: "/apple-icon.png", type: "image/png" }],
+  },
+  openGraph: {
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    type: "website",
+    locale: "tr_TR",
+  },
+  manifest: "/manifest.json",
 };
 
 export const viewport: Viewport = {

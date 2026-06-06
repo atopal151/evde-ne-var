@@ -1,0 +1,16 @@
+{
+  "name": "Bugün Ne Pişirsem?",
+  "short_name": "Ne Pişirsem",
+  "description": "Eldeki malzemelerle AI destekli tarif önerileri",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf7f2",
+  "theme_color": "#1b4332",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

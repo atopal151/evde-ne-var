@@ -1,6 +1,6 @@
-# Evde Ne Var?
+# Bugün Ne Pişirsem?
 
-Akıllı mutfak ve buzdolabı asistanı — stok yönetimi, SKT takibi ve AI destekli tarif önerileri.
+Eldeki malzemelerle AI destekli tarif önerileri — stok yönetimi, SKT takibi ve akıllı alışveriş listesi.
 
 ## Teknoloji
 
@@ -8,13 +8,13 @@ Akıllı mutfak ve buzdolabı asistanı — stok yönetimi, SKT takibi ve AI des
 |--------|--------|
 | Frontend | Next.js 16, React 19, TypeScript, TailwindCSS v4 |
 | Backend | Supabase (PostgreSQL, Auth, Realtime) |
-| AI (Faz 2) | Google Gemini API |
+| AI | Google Gemini API |
 | Barkod | html5-qrcode |
 
 ## Hızlı Başlangıç
 
 ```bash
-cd evde-ne-var
+cd bugun-ne-pisirsem   # veya mevcut klasör adınız
 cp .env.example .env.local
 npm install
 npm run dev
@@ -33,13 +33,13 @@ Tarayıcıda [http://localhost:3000](http://localhost:3000) açın.
 
 ### 2. Veritabanı şeması
 
-Dashboard → **SQL Editor** → New query → sırayla çalıştırın:
+Dashboard → **SQL Editor** → sırayla çalıştırın:
 
 | Dosya | Ne yapar |
 |-------|----------|
-| `supabase/migrations/001_initial_schema.sql` | Tablolar + RLS |
-| `supabase/migrations/002_enable_realtime.sql` | Realtime sync |
-| `supabase/migrations/003_seed_demo_home.sql` | Demo ev kaydı |
+| `supabase/setup_all.sql` | Tablolar + RLS + Realtime + demo ev (tek seferde) |
+| `supabase/migrations/004_auth_rls.sql` | Auth + kullanıcı bazlı RLS |
+| `supabase/migrations/005_ensure_profile.sql` | Profil/ev otomatik oluşturma |
 
 ### 3. API anahtarları
 
@@ -55,6 +55,8 @@ NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
 NEXT_PUBLIC_USE_MOCK_DATA=false
 NEXT_PUBLIC_DEMO_HOME_ID=00000000-0000-4000-a800-000000000001
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-2.5-flash-lite
 ```
 
 ### 5. Doğrula
@@ -66,40 +68,38 @@ npm run dev
 
 Ana sayfada **yeşil "Supabase bağlı"** banner'ı görünmeli; badge **Bulut** olur.
 
-> **Not:** Mock modda `NEXT_PUBLIC_DEMO_HOME_ID=demo-home-001` kullanılır. Supabase modunda UUID gerekir (migration 003).
-
 ## Auth Kurulumu
 
-1. SQL Editor'de `supabase/migrations/004_auth_rls.sql` çalıştırın
+1. SQL Editor'de `004_auth_rls.sql` ve `005_ensure_profile.sql` çalıştırın
 2. Dashboard → **Authentication** → **Providers** → Email açık olsun
-3. Geliştirme için: **Authentication** → **Sign In / Providers** → **Confirm email** kapalı (hızlı test)
+3. Geliştirme için: **Confirm email** kapalı (hızlı test)
 4. Uygulamayı yeniden başlatın → `/register` ile hesap oluşturun
 
-Giriş yapmadan korumalı sayfalara erişilemez (demo mod hariç).
+## Vercel Deploy
+
+1. Kodu GitHub'a push edin
+2. [vercel.com/new](https://vercel.com/new) → repo'yu import edin
+3. **Environment Variables** ekleyin (`.env.local` ile aynı değerler, `NEXT_PUBLIC_USE_MOCK_DATA=false`)
+4. Deploy → canlı URL'yi kopyalayın
+5. Supabase → **Authentication → URL Configuration**:
+   - **Site URL:** `https://SIZIN-URL.vercel.app`
+   - **Redirect URLs:** `https://SIZIN-URL.vercel.app/auth/callback`
 
 ## Proje Yapısı
 
 ```
 src/
 ├── app/                 # Next.js sayfaları + API routes
-│   ├── api/recipes/     # Gemini tarif endpoint'i
-│   └── recipes/         # Tarif sayfası
-├── components/          # UI bileşenleri (inventory, recipes, layout)
-├── hooks/               # React hook'ları
-├── lib/                 # Yardımcılar, Supabase client
-├── services/            # IInventoryService soyutlaması
-│   ├── interfaces/
-│   ├── mock/            # Geliştirme / demo
-│   └── supabase/        # Production
-└── types/               # Domain tipleri
+├── components/          # UI, auth, brand (Logo)
+├── hooks/
+├── lib/brand.ts         # Uygulama adı ve meta
+├── services/            # Mock + Supabase servisleri
+└── types/
 ```
 
 ## Geliştirme Yol Haritası
 
-- [x] **Faz 1** — El ile giriş, barkod tarayıcı, SKT dashboard
+- [x] **Faz 1** — Stok girişi, barkod, SKT dashboard
 - [x] **Faz 2** — Gemini tarif motoru, "Pişirdim" stok düşümü
-- [x] **Faz 3** — Alışveriş listesi, Supabase Realtime sync
-
-## Mobil Taşınabilirlik
-
-`src/services/interfaces/` altındaki arayüzler React Native / Flutter istemcileri tarafından aynı Supabase API'si üzerinden tüketilebilir şekilde tasarlanmıştır.
+- [x] **Faz 3** — Alışveriş listesi, Realtime sync
+- [x] **Auth** — Login, kayıt, RLS

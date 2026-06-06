@@ -1,6 +1,7 @@
+import { Logo } from "@/components/brand/Logo";
 import { AuthShowcase } from "@/components/auth/AuthShowcase";
 import { AuthTabs } from "@/components/auth/AuthTabs";
-import { ChefHat, Package, ShoppingCart, Refrigerator } from "lucide-react";
+import { ChefHat, Package, ShoppingCart } from "lucide-react";
 
 interface AuthShellProps {
   title: string;
@@ -19,14 +20,8 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
           <div className="absolute bottom-32 left-10 h-48 w-48 rounded-full bg-forest-200/20 blur-3xl" />
         </div>
 
-        <div className="relative mb-8 flex items-center gap-3 lg:hidden">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-forest-700 text-white">
-            <Refrigerator className="h-5 w-5" aria-hidden />
-          </div>
-          <div>
-            <p className="font-bold text-navy-900">Evde Ne Var?</p>
-            <p className="text-xs text-navy-500">Akıllı mutfak asistanı</p>
-          </div>
+        <div className="relative mb-8 lg:hidden">
+          <Logo variant="dark" markSize={44} />
         </div>
 
         <div className="relative mx-auto w-full max-w-md">

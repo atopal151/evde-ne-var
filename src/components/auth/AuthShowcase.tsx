@@ -1,7 +1,7 @@
+import { Logo } from "@/components/brand/Logo";
 import {
   ChefHat,
   Package,
-  Refrigerator,
   ShoppingCart,
   Sparkles,
 } from "lucide-react";
@@ -31,21 +31,13 @@ export function AuthShowcase() {
       <div className="pointer-events-none absolute -right-10 bottom-32 h-64 w-64 rounded-full bg-forest-400/15 blur-3xl" />
 
       <div className="relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/15 backdrop-blur">
-            <Refrigerator className="h-6 w-6 text-white" aria-hidden />
-          </div>
-          <div>
-            <p className="text-lg font-bold text-white">Evde Ne Var?</p>
-            <p className="text-sm text-cream-200">Akıllı mutfak asistanınız</p>
-          </div>
-        </div>
+        <Logo variant="light" markSize={48} />
 
         <h2 className="mt-10 max-w-md text-3xl font-bold leading-tight text-white">
-          Mutfağınızı akıllıca yönetin, israf etmeyin.
+          Bugün ne pişireceğinize karar verin.
         </h2>
         <p className="mt-4 max-w-md text-base leading-relaxed text-cream-200">
-          SKT takibi, barkod ile hızlı giriş, yapay zeka tarifleri ve paylaşımlı
+          Eldeki malzemelerle AI tarifleri, stok takibi, SKT uyarıları ve
           alışveriş listesi — hepsi tek uygulamada.
         </p>
 

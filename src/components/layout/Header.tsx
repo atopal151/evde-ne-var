@@ -1,5 +1,6 @@
-import { Refrigerator } from "lucide-react";
+import { LogoMark } from "@/components/brand/Logo";
 import { AuthHeaderActions } from "@/components/auth/AuthHeaderActions";
+import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 
 interface HeaderProps {
   title?: string;
@@ -8,10 +9,12 @@ interface HeaderProps {
 }
 
 export function Header({
-  title = "Evde Ne Var?",
-  subtitle = "Akıllı mutfak asistanınız",
+  title = APP_NAME,
+  subtitle = APP_TAGLINE,
   badge,
 }: HeaderProps) {
+  const isHome = title === APP_NAME;
+
   return (
     <header className="relative overflow-hidden bg-gradient-to-br from-forest-900 via-forest-800 to-navy-900 px-4 pb-10 pt-6 text-white sm:px-6">
       <div className="pointer-events-none absolute -left-16 top-0 h-48 w-48 rounded-full bg-plum-500/20 blur-3xl" />
@@ -19,13 +22,18 @@ export function Header({
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-24 w-[120%] -translate-x-1/2 rounded-[100%] bg-cream-100/10 blur-2xl" />
 
       <div className="relative mx-auto flex max-w-2xl items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-white/15 shadow-inner shadow-black/10 backdrop-blur-sm ring-1 ring-white/10">
-          <Refrigerator className="h-6 w-6" aria-hidden />
+        <div className="shrink-0 overflow-hidden rounded-2xl shadow-lg shadow-black/20 ring-1 ring-white/15">
+          <LogoMark size={48} />
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-            <h1 className="text-xl font-bold tracking-tight sm:text-2xl">
+            <h1
+              className={[
+                "font-bold tracking-tight",
+                isHome ? "text-lg sm:text-xl" : "text-xl sm:text-2xl",
+              ].join(" ")}
+            >
               {title}
             </h1>
             {badge && (

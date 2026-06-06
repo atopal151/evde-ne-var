@@ -44,7 +44,7 @@ export default function HomePage() {
       : undefined;
 
   return (
-    <AppShell subtitle="Buzdolabı ve mutfak stoklarınız" badge={badge}>
+    <AppShell subtitle="Stoklarınız ve tarif önerileriniz" badge={badge}>
       <SupabaseSetupBanner status={supabaseStatus} loading={setupLoading} />
 
       {!isLoading && items.length > 0 && (
