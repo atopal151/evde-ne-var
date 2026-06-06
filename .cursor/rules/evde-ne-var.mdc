@@ -1,0 +1,35 @@
+---
+description: Evde Ne Var? proje mimarisi ve kod standartları
+alwaysApply: true
+---
+
+# Evde Ne Var? — Mimari Kurallar
+
+## Proje Özeti
+Akıllı mutfak/buzdolabı asistanı: stok yönetimi, SKT takibi, Gemini ile tarif üretimi.
+
+## Teknoloji
+- Next.js App Router + TypeScript + TailwindCSS v4
+- Supabase (PostgreSQL, Auth, Realtime)
+- Gemini API (Faz 2)
+
+## Mimari İlkeler
+- **Servis soyutlaması**: `IInventoryService`, `IShoppingListService` arayüzleri; mobil taşınabilirlik için UI doğrudan Supabase çağırmaz
+- **Tip güvenliği**: Tüm domain modelleri `src/types/` altında
+- **Clean code**: Tek sorumluluk, küçük bileşenler, Zod validasyonu
+
+## Renk Paleti (Tailwind)
+- `forest-*` — koyu yeşil (birincil)
+- `plum-*` — mor (vurgu)
+- `coffee-*` — kahve (miktar/ikincil)
+- `navy-*` — lacivert (metin)
+- `cream-*` — arka plan
+
+## Fazlar
+1. Stok girişi (el, barkod), dashboard, SKT uyarıları
+2. Gemini tarif motoru, "Pişirdim" stok düşümü
+3. Alışveriş listesi, çoklu kullanıcı realtime sync
+
+## Dil
+- UI metinleri Türkçe
+- Kod/yorumlar İngilizce veya Türkçe (tutarlı kal)
