@@ -1,8 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
 import { AlertTriangle } from "lucide-react";
 import { InventoryCard } from "@/components/inventory/InventoryCard";
+import { FridgeIllustration } from "@/components/illustrations/KitchenIllustrations";
+import { EmptyState } from "@/components/ui/EmptyState";
 import {
   getExpirationInfo,
   sortByExpirationPriority,
@@ -12,9 +14,10 @@ import type { InventoryItem, ProductCategory } from "@/types/database";
 interface InventoryListProps {
   items: InventoryItem[];
   onDelete?: (id: string) => void;
+  emptyAction?: ReactNode;
 }
 
-export function InventoryList({ items, onDelete }: InventoryListProps) {
+export function InventoryList({ items, onDelete, emptyAction }: InventoryListProps) {
   const sorted = useMemo(() => sortByExpirationPriority(items), [items]);
 
   const grouped = useMemo(() => {
@@ -38,25 +41,27 @@ export function InventoryList({ items, onDelete }: InventoryListProps) {
 
   if (items.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-cream-400 bg-cream-100/50 p-10 text-center">
-        <p className="text-lg font-medium text-navy-700">Stok boş</p>
-        <p className="mt-1 text-sm text-navy-500">
-          İlk malzemenizi ekleyerek başlayın.
-        </p>
-      </div>
+      <EmptyState
+        illustration={<FridgeIllustration className="h-36 w-36" />}
+        title="Buzdolabınız boş görünüyor"
+        description="İlk malzemenizi ekleyerek stok takibine başlayın. SKT uyarıları otomatik hesaplanır."
+        action={emptyAction}
+      />
     );
   }
 
   return (
     <div className="space-y-6">
       {urgentCount > 0 && (
-        <div className="flex items-start gap-3 rounded-2xl border border-orange-200 bg-orange-50 p-4">
-          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-orange-600" />
+        <div className="flex items-start gap-3 rounded-2xl border border-orange-200/80 bg-gradient-to-r from-orange-50 to-amber-50/80 p-4 shadow-sm">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-orange-100">
+            <AlertTriangle className="h-5 w-5 text-orange-600" />
+          </div>
           <div>
             <p className="font-semibold text-orange-900">
               {urgentCount} ürünün SKT&apos;si yaklaşıyor
             </p>
-            <p className="text-sm text-orange-700">
+            <p className="text-sm text-orange-700/90">
               Kritik ürünler listenin en üstünde gösteriliyor.
             </p>
           </div>
@@ -65,9 +70,15 @@ export function InventoryList({ items, onDelete }: InventoryListProps) {
 
       {Array.from(grouped.entries()).map(([category, categoryItems]) => (
         <section key={category}>
-          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-plum-700">
-            {category}
-          </h2>
+          <div className="mb-3 flex items-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-plum-500" />
+            <h2 className="text-sm font-bold uppercase tracking-wider text-plum-700">
+              {category}
+            </h2>
+            <span className="rounded-full bg-plum-100 px-2 py-0.5 text-xs font-medium text-plum-700">
+              {categoryItems.length}
+            </span>
+          </div>
           <ul className="space-y-3">
             {categoryItems.map((item) => (
               <li key={item.id}>

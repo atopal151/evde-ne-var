@@ -7,57 +7,54 @@ import { Home, PlusCircle, ChefHat, ShoppingCart } from "lucide-react";
 const links = [
   { href: "/", label: "Stok", icon: Home },
   { href: "/inventory/add", label: "Ekle", icon: PlusCircle },
-  { href: "/recipes", label: "Tarifler", icon: ChefHat, disabled: true },
-  { href: "/shopping", label: "Liste", icon: ShoppingCart, disabled: true },
+  { href: "/recipes", label: "Tarifler", icon: ChefHat },
+  { href: "/shopping", label: "Liste", icon: ShoppingCart },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-cream-300 bg-white/95 backdrop-blur-md safe-area-pb">
-      <ul className="mx-auto flex max-w-2xl justify-around px-2 py-2">
-        {links.map(({ href, label, icon: Icon, disabled }) => {
-          const active = pathname === href;
-          const content = (
-            <>
-              <Icon
-                className={[
-                  "h-5 w-5",
-                  active ? "text-forest-700" : "text-navy-400",
-                  disabled ? "opacity-40" : "",
-                ].join(" ")}
-              />
-              <span
-                className={[
-                  "text-xs font-medium",
-                  active ? "text-forest-800" : "text-navy-500",
-                  disabled ? "opacity-40" : "",
-                ].join(" ")}
-              >
-                {label}
-              </span>
-            </>
-          );
+    <nav className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-3 pt-2 safe-area-pb">
+      <div className="mx-auto max-w-md rounded-2xl border border-cream-300/80 bg-white/90 shadow-xl shadow-navy-900/10 backdrop-blur-xl">
+        <ul className="flex justify-around px-1 py-1.5">
+          {links.map(({ href, label, icon: Icon }) => {
+            const active = pathname === href;
 
-          return (
-            <li key={href} className="flex-1">
-              {disabled ? (
-                <span className="flex flex-col items-center gap-1 py-1 cursor-not-allowed">
-                  {content}
-                </span>
-              ) : (
+            return (
+              <li key={href} className="flex-1">
                 <Link
                   href={href}
-                  className="flex flex-col items-center gap-1 py-1 transition-colors"
+                  className={[
+                    "relative flex flex-col items-center gap-1 rounded-xl px-2 py-2 transition-all duration-200",
+                    active
+                      ? "bg-gradient-to-b from-forest-50 to-forest-100/80 text-forest-800 shadow-sm"
+                      : "text-navy-400 hover:text-navy-600",
+                  ].join(" ")}
                 >
-                  {content}
+                  {active && (
+                    <span className="absolute -top-0.5 h-1 w-8 rounded-full bg-forest-600" />
+                  )}
+                  <Icon
+                    className={[
+                      "h-5 w-5 transition-transform",
+                      active ? "scale-110 text-forest-700" : "",
+                    ].join(" ")}
+                  />
+                  <span
+                    className={[
+                      "text-[11px] font-semibold",
+                      active ? "text-forest-800" : "text-navy-500",
+                    ].join(" ")}
+                  >
+                    {label}
+                  </span>
                 </Link>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </nav>
   );
 }

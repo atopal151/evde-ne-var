@@ -26,17 +26,65 @@ Tarayıcıda [http://localhost:3000](http://localhost:3000) açın.
 
 ## Supabase Kurulumu
 
-1. [supabase.com](https://supabase.com) üzerinde proje oluşturun
-2. `supabase/migrations/001_initial_schema.sql` dosyasını SQL Editor'de çalıştırın
-3. `.env.local` dosyasına URL ve anon key ekleyin
-4. `NEXT_PUBLIC_USE_MOCK_DATA=false` yapın
+### 1. Proje oluştur
+
+1. [supabase.com/dashboard](https://supabase.com/dashboard) → **New project**
+2. Proje adı + şifre belirleyin, bölge seçin
+
+### 2. Veritabanı şeması
+
+Dashboard → **SQL Editor** → New query → sırayla çalıştırın:
+
+| Dosya | Ne yapar |
+|-------|----------|
+| `supabase/migrations/001_initial_schema.sql` | Tablolar + RLS |
+| `supabase/migrations/002_enable_realtime.sql` | Realtime sync |
+| `supabase/migrations/003_seed_demo_home.sql` | Demo ev kaydı |
+
+### 3. API anahtarları
+
+Settings → **API** → kopyalayın:
+
+- Project URL → `NEXT_PUBLIC_SUPABASE_URL`
+- anon public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### 4. `.env.local` güncelle
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://xxxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+NEXT_PUBLIC_USE_MOCK_DATA=false
+NEXT_PUBLIC_DEMO_HOME_ID=00000000-0000-4000-a800-000000000001
+```
+
+### 5. Doğrula
+
+```bash
+npm run verify:supabase
+npm run dev
+```
+
+Ana sayfada **yeşil "Supabase bağlı"** banner'ı görünmeli; badge **Bulut** olur.
+
+> **Not:** Mock modda `NEXT_PUBLIC_DEMO_HOME_ID=demo-home-001` kullanılır. Supabase modunda UUID gerekir (migration 003).
+
+## Auth Kurulumu
+
+1. SQL Editor'de `supabase/migrations/004_auth_rls.sql` çalıştırın
+2. Dashboard → **Authentication** → **Providers** → Email açık olsun
+3. Geliştirme için: **Authentication** → **Sign In / Providers** → **Confirm email** kapalı (hızlı test)
+4. Uygulamayı yeniden başlatın → `/register` ile hesap oluşturun
+
+Giriş yapmadan korumalı sayfalara erişilemez (demo mod hariç).
 
 ## Proje Yapısı
 
 ```
 src/
-├── app/                 # Next.js sayfaları
-├── components/          # UI bileşenleri
+├── app/                 # Next.js sayfaları + API routes
+│   ├── api/recipes/     # Gemini tarif endpoint'i
+│   └── recipes/         # Tarif sayfası
+├── components/          # UI bileşenleri (inventory, recipes, layout)
 ├── hooks/               # React hook'ları
 ├── lib/                 # Yardımcılar, Supabase client
 ├── services/            # IInventoryService soyutlaması
@@ -49,8 +97,8 @@ src/
 ## Geliştirme Yol Haritası
 
 - [x] **Faz 1** — El ile giriş, barkod tarayıcı, SKT dashboard
-- [ ] **Faz 2** — Gemini tarif motoru, "Pişirdim" stok düşümü
-- [ ] **Faz 3** — Alışveriş listesi, çoklu kullanıcı sync
+- [x] **Faz 2** — Gemini tarif motoru, "Pişirdim" stok düşümü
+- [x] **Faz 3** — Alışveriş listesi, Supabase Realtime sync
 
 ## Mobil Taşınabilirlik
 

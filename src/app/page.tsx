@@ -1,57 +1,104 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { Plus, RefreshCw } from "lucide-react";
+import { useEffect, useMemo } from "react";
+import { AlertTriangle, Package, Plus, RefreshCw } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { InventoryList } from "@/components/inventory/InventoryList";
+import { SupabaseSetupBanner } from "@/components/setup/SupabaseSetupBanner";
 import { Button } from "@/components/ui/Button";
+import { PageSection } from "@/components/ui/PageSection";
+import { StatCard } from "@/components/ui/StatCard";
 import { useInventory } from "@/hooks/useInventory";
+import { useSupabaseSetup } from "@/hooks/useSupabaseSetup";
+import { getExpirationInfo } from "@/lib/utils/expiration";
 
 export default function HomePage() {
   const router = useRouter();
-  const { items, loading, error, refresh, removeItem, isMockMode } =
+  const { user, loading: authLoading, isMockMode } = useAuth();
+  const { items, loading, error, refresh, removeItem, authLoading: inventoryAuthLoading } =
     useInventory();
+  const { status: supabaseStatus, loading: setupLoading } = useSupabaseSetup();
+
+  useEffect(() => {
+    if (!isMockMode && !authLoading && !user) {
+      router.replace("/login");
+    }
+  }, [isMockMode, authLoading, user, router]);
+
+  const urgentCount = useMemo(
+    () =>
+      items.filter((i) => {
+        const s = getExpirationInfo(i.expiration_date).status;
+        return s === "expired" || s === "critical" || s === "warning";
+      }).length,
+    [items]
+  );
+
+  const isLoading = loading || authLoading || inventoryAuthLoading;
+  const badge = isMockMode
+    ? "Demo"
+    : supabaseStatus?.connected
+      ? "Bulut"
+      : undefined;
 
   return (
-    <AppShell
-      subtitle="Buzdolabı ve mutfak stoklarınız"
-      badge={isMockMode ? "Demo" : undefined}
-    >
-      <div className="mb-6 flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-lg font-bold text-navy-900">Stoklarım</h2>
-          <p className="text-sm text-navy-500">
-            {loading ? "Yükleniyor..." : `${items.length} ürün`}
-          </p>
+    <AppShell subtitle="Buzdolabı ve mutfak stoklarınız" badge={badge}>
+      <SupabaseSetupBanner status={supabaseStatus} loading={setupLoading} />
+
+      {!isLoading && items.length > 0 && (
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          <StatCard
+            label="Toplam ürün"
+            value={items.length}
+            icon={Package}
+            tone="forest"
+          />
+          <StatCard
+            label="SKT uyarısı"
+            value={urgentCount}
+            icon={AlertTriangle}
+            tone={urgentCount > 0 ? "orange" : "plum"}
+          />
         </div>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => void refresh()}
-            aria-label="Yenile"
-          >
-            <RefreshCw className="h-4 w-4" />
-          </Button>
-          <Button size="sm" onClick={() => router.push("/inventory/add")}>
-            <Plus className="h-4 w-4" />
-            Ekle
-          </Button>
-        </div>
-      </div>
+      )}
+
+      <PageSection
+        title="Stoklarım"
+        subtitle={
+          isLoading ? "Yükleniyor..." : `${items.length} ürün takip ediliyor`
+        }
+        actions={
+          <>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => void refresh()}
+              aria-label="Yenile"
+            >
+              <RefreshCw className="h-4 w-4" />
+            </Button>
+            <Button size="sm" onClick={() => router.push("/inventory/add")}>
+              <Plus className="h-4 w-4" />
+              Ekle
+            </Button>
+          </>
+        }
+      />
 
       {error && (
-        <div className="mb-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">
+        <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </div>
       )}
 
-      {loading ? (
+      {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div
               key={i}
-              className="h-24 animate-pulse rounded-2xl bg-cream-300"
+              className="h-24 rounded-2xl skeleton-shimmer"
             />
           ))}
         </div>
@@ -59,6 +106,12 @@ export default function HomePage() {
         <InventoryList
           items={items}
           onDelete={(id) => void removeItem(id)}
+          emptyAction={
+            <Button onClick={() => router.push("/inventory/add")}>
+              <Plus className="h-4 w-4" />
+              İlk ürünü ekle
+            </Button>
+          }
         />
       )}
     </AppShell>

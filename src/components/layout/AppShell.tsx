@@ -17,12 +17,12 @@ export function AppShell({
   hideHeader,
 }: AppShellProps) {
   return (
-    <div className="flex min-h-full flex-col bg-cream-100">
+    <div className="app-bg flex min-h-full flex-col">
       {!hideHeader && (
         <Header title={title} subtitle={subtitle} badge={badge} />
       )}
-      <main className="mx-auto w-full max-w-2xl flex-1 px-4 py-6 pb-28 sm:px-6">
-        {children}
+      <main className="relative mx-auto w-full max-w-2xl flex-1 px-4 py-6 pb-32 sm:px-6">
+        <div className="animate-fade-up">{children}</div>
       </main>
       <BottomNav />
     </div>
