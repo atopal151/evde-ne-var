@@ -34,13 +34,25 @@ export async function GET() {
   if (mockMode) {
     status.message = url && key
       ? "Supabase env tanımlı ama NEXT_PUBLIC_USE_MOCK_DATA=true — veriler localStorage'da."
-      : "Demo mod: Supabase URL/key .env.local dosyasında tanımlı değil.";
-    status.steps = [
-      "supabase.com → New project",
-      "SQL Editor'de migration dosyalarını sırayla çalıştırın",
-      ".env.local → URL, anon key, USE_MOCK_DATA=false",
-      "Sunucuyu yeniden başlatın",
-    ];
+      : process.env.VERCEL
+        ? "Demo mod: Vercel proje ayarlarında Supabase ortam değişkenleri tanımlı değil (veya redeploy edilmedi)."
+        : "Demo mod: Supabase URL/key .env.local dosyasında tanımlı değil.";
+    status.steps = process.env.VERCEL
+      ? [
+          "Vercel → Project → Settings → Environment Variables",
+          "NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY ekleyin",
+          "NEXT_PUBLIC_USE_MOCK_DATA=false",
+          "NEXT_PUBLIC_DEMO_HOME_ID=00000000-0000-4000-a800-000000000001",
+          "GEMINI_API_KEY ve GEMINI_MODEL (tarifler için)",
+          "Deployments → son deploy → Redeploy (NEXT_PUBLIC_* build'de gömülür)",
+          "Supabase → Auth → Redirect URL: https://SIZIN-URL.vercel.app/auth/callback",
+        ]
+      : [
+          "supabase.com → New project",
+          "SQL Editor'de migration dosyalarını sırayla çalıştırın",
+          ".env.local → URL, anon key, USE_MOCK_DATA=false",
+          "Sunucuyu yeniden başlatın",
+        ];
     return NextResponse.json(status);
   }
 

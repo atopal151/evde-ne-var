@@ -1,6 +1,6 @@
 "use client";
 
-import { Database, ExternalLink } from "lucide-react";
+import { Database } from "lucide-react";
 import type { SupabaseSetupStatus } from "@/hooks/useSupabaseSetup";
 
 interface SupabaseSetupBannerProps {
@@ -44,36 +44,18 @@ export function SupabaseSetupBanner({ status, loading }: SupabaseSetupBannerProp
       <div className="mb-4 rounded-xl border border-cream-400 bg-cream-200/60 px-4 py-3 text-sm text-navy-800">
         <p className="font-semibold">Veriler tarayıcıda (demo mod)</p>
         <p className="mt-1">{status.message}</p>
-        <details className="mt-2">
-          <summary className="cursor-pointer font-medium text-forest-800">
-            Supabase kurulum adımları
-          </summary>
-          <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-navy-700">
-            <li>
-              <a
-                href="https://supabase.com/dashboard"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-forest-700 underline"
-              >
-                supabase.com
-                <ExternalLink className="h-3 w-3" />
-              </a>
-              {" "}→ New project
-            </li>
-            <li>
-              SQL Editor → sırayla çalıştırın:
-              <code className="ml-1 rounded bg-white px-1 text-xs">001</code>
-              <code className="ml-1 rounded bg-white px-1 text-xs">002</code>
-              <code className="ml-1 rounded bg-white px-1 text-xs">003</code>
-            </li>
-            <li>Settings → API → URL + anon key → <code className="rounded bg-white px-1 text-xs">.env.local</code></li>
-            <li>
-              <code className="rounded bg-white px-1 text-xs">NEXT_PUBLIC_USE_MOCK_DATA=false</code>
-            </li>
-            <li>Terminal: <code className="rounded bg-white px-1 text-xs">npm run verify:supabase</code></li>
-          </ol>
-        </details>
+        {status.steps && status.steps.length > 0 && (
+          <details className="mt-2" open>
+            <summary className="cursor-pointer font-medium text-forest-800">
+              Nasıl düzeltilir?
+            </summary>
+            <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-navy-700">
+              {status.steps.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </details>
+        )}
       </div>
     );
   }
