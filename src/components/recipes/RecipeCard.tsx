@@ -5,6 +5,7 @@ import type { Recipe } from "@/types/recipes";
 interface RecipeCardProps {
   recipe: Recipe;
   onSelect: (recipe: Recipe) => void;
+  isNew?: boolean;
 }
 
 const matchTone = (rate: string) => {
@@ -14,11 +15,16 @@ const matchTone = (rate: string) => {
   return "from-coffee-500 to-coffee-700";
 };
 
-export function RecipeCard({ recipe, onSelect }: RecipeCardProps) {
+export function RecipeCard({ recipe, onSelect, isNew }: RecipeCardProps) {
   return (
     <Card
       padding="md"
-      className="group cursor-pointer overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:border-plum-200/60 hover:shadow-xl hover:shadow-plum-900/10"
+      className={[
+        "group cursor-pointer overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl",
+        isNew
+          ? "border-forest-200/80 bg-gradient-to-br from-forest-50 to-emerald-50/70 hover:border-forest-300/80 hover:shadow-forest-900/10"
+          : "hover:border-plum-200/60 hover:shadow-plum-900/10",
+      ].join(" ")}
       onClick={() => onSelect(recipe)}
       role="button"
       tabIndex={0}
@@ -38,10 +44,17 @@ export function RecipeCard({ recipe, onSelect }: RecipeCardProps) {
         </div>
 
         <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-navy-900 group-hover:text-forest-800">
-              {recipe.name}
-            </h3>
+          <div className="flex flex-wrap items-start justify-between gap-x-2 gap-y-1">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
+              <h3 className="font-semibold text-navy-900 group-hover:text-forest-800">
+                {recipe.name}
+              </h3>
+              {isNew && (
+                <span className="shrink-0 rounded-full bg-forest-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-forest-700">
+                  Yeni
+                </span>
+              )}
+            </div>
             <span
               className={[
                 "shrink-0 rounded-full bg-gradient-to-r px-2.5 py-1 text-xs font-bold text-white shadow-sm",

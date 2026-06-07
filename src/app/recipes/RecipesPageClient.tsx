@@ -4,25 +4,22 @@ import { useMemo, useState } from "react";
 import { ChefHat, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { RecipeIllustration } from "@/components/illustrations/KitchenIllustrations";
-import { GeminiStatusBanner } from "@/components/recipes/GeminiStatusBanner";
 import { CookedConfirmDialog } from "@/components/recipes/CookedConfirmDialog";
 import { RecipeCard } from "@/components/recipes/RecipeCard";
 import { RecipeDetail } from "@/components/recipes/RecipeDetail";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { PageSection } from "@/components/ui/PageSection";
-import { useGeminiStatus } from "@/hooks/useGeminiStatus";
 import { useInventory } from "@/hooks/useInventory";
 import { useRecipes } from "@/hooks/useRecipes";
+import { isFromLatestBatch } from "@/lib/recipes/recipeHistory";
 import { resolveIngredientDeductions } from "@/lib/recipes/matchIngredients";
 import type { Recipe } from "@/types/recipes";
 
 export function RecipesPageClient() {
-  const { status: geminiStatus, message: geminiMessage, isGeminiReady } =
-    useGeminiStatus();
   const { items, loading: inventoryLoading, deductIngredients } =
     useInventory();
-  const { entries, maxHistory, hydrated, loading, error, warning, source, generate } =
+  const { entries, lastBatchAt, maxHistory, hydrated, loading, error, warning, generate } =
     useRecipes();
 
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
@@ -64,11 +61,8 @@ export function RecipesPageClient() {
     <AppShell
       title="Tarifler"
       subtitle="Eldeki malzemelerle AI destekli öneriler"
-      badge={isGeminiReady ? "Gemini ✓" : "Demo"}
     >
       <div className="mb-6 space-y-4">
-        <GeminiStatusBanner status={geminiStatus} message={geminiMessage} />
-
         <PageSection
           title="Tarif Öner"
           subtitle={
@@ -97,18 +91,6 @@ export function RecipesPageClient() {
             title="Stok boş"
             description="Tarif almak için önce malzeme ekleyin. Stok sayfasından hızlıca ürün girebilirsiniz."
           />
-        )}
-
-        {source === "gemini" && entries.length > 0 && (
-          <div className="rounded-2xl border border-forest-200/60 bg-gradient-to-r from-forest-50 to-emerald-50/40 px-4 py-3 text-sm text-forest-800">
-            ✨ Son tarifler Gemini AI ile üretildi.
-          </div>
-        )}
-
-        {source === "mock" && entries.length > 0 && !warning && (
-          <div className="rounded-2xl border border-cream-300 bg-cream-100/80 px-4 py-3 text-sm text-navy-700">
-            Son tarifler demo modda üretildi (API key yok veya geçersiz).
-          </div>
         )}
 
         {warning && (
@@ -144,16 +126,13 @@ export function RecipesPageClient() {
         </div>
       ) : entries.length > 0 ? (
         <div>
-          <p className="mb-3 text-sm text-navy-500">
-            En eski tarif üstte — yeni üretimler listeye eklenir (en fazla{" "}
-            {maxHistory}).
-          </p>
           <ul className="space-y-3">
             {entries.map((entry) => (
               <li key={entry.id}>
                 <RecipeCard
                   recipe={entry.recipe}
                   onSelect={setSelectedRecipe}
+                  isNew={isFromLatestBatch(entry, lastBatchAt)}
                 />
               </li>
             ))}

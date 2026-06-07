@@ -28,7 +28,7 @@ export function BottomNav() {
                   className={[
                     "relative flex flex-col items-center gap-1 rounded-xl px-2 py-2 transition-all duration-200",
                     active
-                      ? "bg-gradient-to-b from-forest-50 to-forest-100/80 text-forest-800 shadow-sm"
+                      ? "bg-forest-100 text-forest-800"
                       : "text-navy-400 hover:text-navy-600",
                   ].join(" ")}
                 >

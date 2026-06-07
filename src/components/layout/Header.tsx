@@ -22,9 +22,7 @@ export function Header({
       <div className="pointer-events-none absolute bottom-0 left-1/2 h-24 w-[120%] -translate-x-1/2 rounded-[100%] bg-cream-100/10 blur-2xl" />
 
       <div className="relative mx-auto flex max-w-2xl items-center gap-3">
-        <div className="shrink-0 overflow-hidden rounded-2xl shadow-lg shadow-black/20 ring-1 ring-white/15">
-          <LogoMark size={48} />
-        </div>
+        <LogoMark size={48} className="ring-1 ring-white/15" />
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1">

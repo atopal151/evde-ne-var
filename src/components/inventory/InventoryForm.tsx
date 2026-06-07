@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { z } from "zod";
 import { Barcode, PenLine } from "lucide-react";
-import { BarcodeScanner, resolveBarcodeHint } from "@/components/inventory/BarcodeScanner";
+import { BarcodeScanner } from "@/components/inventory/BarcodeScanner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
@@ -30,6 +30,8 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
   const [tab, setTab] = useState<Tab>(initialBarcode ? "barcode" : "manual");
   const [showScanner, setShowScanner] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupMessage, setLookupMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [form, setForm] = useState({
@@ -41,17 +43,54 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
     barcode: initialBarcode ?? "",
   });
 
-  const handleBarcodeScan = (barcode: string) => {
-    const hint = resolveBarcodeHint(barcode);
-    setForm((prev) => ({
-      ...prev,
-      barcode,
-      product_name: hint?.name ?? prev.product_name,
-      category: hint?.category ?? prev.category,
-      unit: hint?.unit ?? prev.unit,
-    }));
+  const handleBarcodeScan = async (barcode: string) => {
     setShowScanner(false);
     setTab("manual");
+    setLookupLoading(true);
+    setLookupMessage(null);
+
+    try {
+      const response = await fetch(
+        `/api/products/lookup?barcode=${encodeURIComponent(barcode)}`
+      );
+      const data = (await response.json()) as {
+        found?: boolean;
+        product?: {
+          barcode: string;
+          name: string;
+          category: ProductCategory;
+          unit: InventoryUnit;
+        };
+      };
+
+      if (data.found && data.product) {
+        setForm((prev) => ({
+          ...prev,
+          barcode: data.product!.barcode,
+          product_name: data.product!.name,
+          category: data.product!.category,
+          unit: data.product!.unit,
+        }));
+        setLookupMessage(`"${data.product.name}" otomatik dolduruldu.`);
+        return;
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        barcode: barcode.replace(/\D/g, "") || barcode,
+      }));
+      setLookupMessage(
+        "Bu barkod veritabanında bulunamadı. Ürün adını el ile girebilirsiniz."
+      );
+    } catch {
+      setForm((prev) => ({
+        ...prev,
+        barcode: barcode.replace(/\D/g, "") || barcode,
+      }));
+      setLookupMessage("Ürün araması başarısız. Bilgileri el ile girebilirsiniz.");
+    } finally {
+      setLookupLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -106,7 +145,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
           className={[
             "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-colors",
             tab === "manual"
-              ? "bg-white text-forest-800 shadow-sm"
+              ? "bg-white text-forest-800"
               : "text-navy-600 hover:text-navy-800",
           ].join(" ")}
         >
@@ -122,7 +161,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
           className={[
             "flex flex-1 items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium transition-colors",
             tab === "barcode"
-              ? "bg-white text-forest-800 shadow-sm"
+              ? "bg-white text-forest-800"
               : "text-navy-600 hover:text-navy-800",
           ].join(" ")}
         >
@@ -133,9 +172,21 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
 
       {tab === "barcode" && showScanner && (
         <BarcodeScanner
-          onScan={handleBarcodeScan}
+          onScan={(code) => void handleBarcodeScan(code)}
           onClose={() => setShowScanner(false)}
         />
+      )}
+
+      {lookupLoading && (
+        <p className="rounded-xl bg-forest-50 px-3 py-2 text-sm text-forest-800">
+          Barkod aranıyor…
+        </p>
+      )}
+
+      {lookupMessage && !lookupLoading && (
+        <p className="rounded-xl bg-cream-200/80 px-3 py-2 text-sm text-navy-700">
+          {lookupMessage}
+        </p>
       )}
 
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">

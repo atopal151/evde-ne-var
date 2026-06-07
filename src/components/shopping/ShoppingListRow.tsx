@@ -27,7 +27,7 @@ export function ShoppingListRow({
         className={[
           "flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-200",
           item.is_completed
-            ? "border-forest-600 bg-gradient-to-b from-forest-500 to-forest-700 text-white shadow-sm"
+            ? "border-forest-600 bg-forest-600 text-white"
             : "border-cream-400 bg-white hover:border-forest-500 hover:bg-forest-50",
         ].join(" ")}
         aria-label={

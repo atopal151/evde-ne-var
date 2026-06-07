@@ -14,10 +14,19 @@ export interface RecipeHistory {
   entries: StoredRecipe[];
   lastSource?: "gemini" | "mock";
   lastWarning?: string | null;
+  lastBatchAt?: string | null;
 }
 
 function storageKey(scope: string): string {
   return `${RECIPE_HISTORY_STORAGE_PREFIX}-${scope}`;
+}
+
+function getLatestSavedAt(entries: StoredRecipe[]): string | null {
+  if (entries.length === 0) return null;
+  return entries.reduce(
+    (latest, entry) => (entry.savedAt > latest ? entry.savedAt : latest),
+    entries[0].savedAt
+  );
 }
 
 export function loadRecipeHistory(scope: string): RecipeHistory {
@@ -32,10 +41,13 @@ export function loadRecipeHistory(scope: string): RecipeHistory {
     const parsed = JSON.parse(raw) as RecipeHistory;
     const entries = Array.isArray(parsed.entries) ? parsed.entries : [];
 
+    const sorted = sortEntriesNewestFirst(entries).slice(0, MAX_RECIPE_HISTORY);
+
     return {
-      entries: sortEntriesOldestFirst(entries).slice(-MAX_RECIPE_HISTORY),
+      entries: sorted,
       lastSource: parsed.lastSource,
       lastWarning: parsed.lastWarning ?? null,
+      lastBatchAt: parsed.lastBatchAt ?? getLatestSavedAt(sorted),
     };
   } catch {
     return { entries: [] };
@@ -49,15 +61,22 @@ export function saveRecipeHistory(scope: string, history: RecipeHistory): void {
     storageKey(scope),
     JSON.stringify({
       ...history,
-      entries: sortEntriesOldestFirst(history.entries).slice(-MAX_RECIPE_HISTORY),
+      entries: sortEntriesNewestFirst(history.entries).slice(0, MAX_RECIPE_HISTORY),
     })
   );
 }
 
-function sortEntriesOldestFirst(entries: StoredRecipe[]): StoredRecipe[] {
+function sortEntriesNewestFirst(entries: StoredRecipe[]): StoredRecipe[] {
   return [...entries].sort(
-    (a, b) => new Date(a.savedAt).getTime() - new Date(b.savedAt).getTime()
+    (a, b) => new Date(b.savedAt).getTime() - new Date(a.savedAt).getTime()
   );
+}
+
+export function isFromLatestBatch(
+  entry: StoredRecipe,
+  lastBatchAt: string | null | undefined
+): boolean {
+  return Boolean(lastBatchAt && entry.savedAt === lastBatchAt);
 }
 
 function createEntryId(index: number): string {
@@ -87,16 +106,14 @@ export function appendRecipesToHistory(
     }
   }
 
-  const merged = sortEntriesOldestFirst(Array.from(byName.values()));
-  const trimmed =
-    merged.length > MAX_RECIPE_HISTORY
-      ? merged.slice(merged.length - MAX_RECIPE_HISTORY)
-      : merged;
+  const merged = sortEntriesNewestFirst(Array.from(byName.values()));
+  const trimmed = merged.slice(0, MAX_RECIPE_HISTORY);
 
   return {
     entries: trimmed,
     lastSource: meta.source,
     lastWarning: meta.warning ?? null,
+    lastBatchAt: savedAt,
   };
 }
 

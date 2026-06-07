@@ -12,7 +12,7 @@ export function AuthTabs() {
     [
       "flex-1 rounded-lg py-2.5 text-center text-sm font-semibold transition-colors",
       active
-        ? "bg-white text-forest-800 shadow-sm"
+        ? "bg-white text-forest-800"
         : "text-navy-600 hover:text-navy-900",
     ].join(" ");
 

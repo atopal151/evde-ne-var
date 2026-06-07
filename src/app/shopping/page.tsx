@@ -1,6 +1,6 @@
 "use client";
 
-import { RefreshCw, Trash2, Wifi } from "lucide-react";
+import { RefreshCw, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ShoppingIllustration } from "@/components/illustrations/KitchenIllustrations";
 import { AddShoppingItemForm } from "@/components/shopping/AddShoppingItemForm";
@@ -22,15 +22,12 @@ export default function ShoppingPage() {
     toggleComplete,
     removeItem,
     clearCompleted,
-    isMockMode,
-    isRealtime,
   } = useShoppingList();
 
   return (
     <AppShell
       title="Alışveriş Listesi"
       subtitle="Eksik malzemeleri takip edin"
-      badge={isMockMode ? "Demo" : isRealtime ? "Canlı" : undefined}
     >
       <PageSection
         title="Listem"
@@ -50,18 +47,6 @@ export default function ShoppingPage() {
           </Button>
         }
       />
-
-      {isRealtime && (
-        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-forest-200/60 bg-gradient-to-r from-forest-50 to-emerald-50/50 px-4 py-3 text-sm text-forest-800 shadow-sm">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-forest-100">
-            <Wifi className="h-4 w-4 text-forest-700" />
-          </div>
-          <p>
-            Supabase Realtime — diğer cihazlardan yapılan değişiklikler otomatik
-            yansır.
-          </p>
-        </div>
-      )}
 
       {error && (
         <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">

@@ -6,12 +6,10 @@ import { AlertTriangle, Package, Plus, RefreshCw } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { InventoryList } from "@/components/inventory/InventoryList";
-import { SupabaseSetupBanner } from "@/components/setup/SupabaseSetupBanner";
 import { Button } from "@/components/ui/Button";
 import { PageSection } from "@/components/ui/PageSection";
 import { StatCard } from "@/components/ui/StatCard";
 import { useInventory } from "@/hooks/useInventory";
-import { useSupabaseSetup } from "@/hooks/useSupabaseSetup";
 import { getExpirationInfo } from "@/lib/utils/expiration";
 
 export default function HomePage() {
@@ -19,7 +17,6 @@ export default function HomePage() {
   const { user, loading: authLoading, isMockMode } = useAuth();
   const { items, loading, error, refresh, removeItem, authLoading: inventoryAuthLoading } =
     useInventory();
-  const { status: supabaseStatus, loading: setupLoading } = useSupabaseSetup();
 
   useEffect(() => {
     if (!isMockMode && !authLoading && !user) {
@@ -37,15 +34,9 @@ export default function HomePage() {
   );
 
   const isLoading = loading || authLoading || inventoryAuthLoading;
-  const badge = isMockMode
-    ? "Demo"
-    : supabaseStatus?.connected
-      ? "Bulut"
-      : undefined;
 
   return (
-    <AppShell subtitle="Stoklarınız ve tarif önerileriniz" badge={badge}>
-      <SupabaseSetupBanner status={supabaseStatus} loading={setupLoading} />
+    <AppShell subtitle="Stoklarınız ve tarif önerileriniz">
 
       {!isLoading && items.length > 0 && (
         <div className="mb-6 grid grid-cols-2 gap-3">

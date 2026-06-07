@@ -18,6 +18,7 @@ export function useRecipes() {
   const scope = user?.id ?? "guest";
 
   const [entries, setEntries] = useState<StoredRecipe[]>([]);
+  const [lastBatchAt, setLastBatchAt] = useState<string | null>(null);
   const [hydrated, setHydrated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -27,6 +28,7 @@ export function useRecipes() {
   useEffect(() => {
     const history = loadRecipeHistory(scope);
     setEntries(history.entries);
+    setLastBatchAt(history.lastBatchAt ?? null);
     setSource(history.lastSource ?? null);
     setWarning(history.lastWarning ?? null);
     setHydrated(true);
@@ -61,6 +63,7 @@ export function useRecipes() {
 
         saveRecipeHistory(scope, updated);
         setEntries(updated.entries);
+        setLastBatchAt(updated.lastBatchAt ?? null);
         if (data.warning) setWarning(data.warning);
         if (data.source) setSource(data.source);
       } catch (e) {
@@ -75,6 +78,7 @@ export function useRecipes() {
   const clear = useCallback(() => {
     clearRecipeHistory(scope);
     setEntries([]);
+    setLastBatchAt(null);
     setError(null);
     setWarning(null);
     setSource(null);
@@ -82,6 +86,7 @@ export function useRecipes() {
 
   return {
     entries,
+    lastBatchAt,
     recipes: entries.map((entry) => entry.recipe),
     maxHistory: MAX_RECIPE_HISTORY,
     hydrated,
