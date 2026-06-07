@@ -41,7 +41,8 @@ Dashboard → **SQL Editor** → sırayla çalıştırın:
 | `supabase/migrations/004_auth_rls.sql` | Auth + kullanıcı bazlı RLS |
 | `supabase/migrations/005_ensure_profile.sql` | Profil/ev otomatik oluşturma |
 | `supabase/migrations/006_family_sharing.sql` | Aile daveti, onay, ortak liste |
-| `supabase/migrations/006_family_sharing.sql` | Aile daveti, onay, ortak liste |
+| `supabase/migrations/007_fix_family_invitations.sql` | Gelen davet e-posta eşleşmesi |
+| `supabase/migrations/008_fix_ambiguous_columns.sql` | SQL ambiguous column hatası düzeltmesi |
 
 ### 3. API anahtarları
 
@@ -72,17 +73,10 @@ Ana sayfada **yeşil "Supabase bağlı"** banner'ı görünmeli; badge **Bulut**
 
 ## Aile Paylaşımı (Ortak Alışveriş Listesi)
 
-1. SQL Editor'de `006_family_sharing.sql` çalıştırın (004 ve 005 sonrası)
+1. SQL Editor'de `006`, `007` ve `008` migration dosyalarını çalıştırın (004 ve 005 sonrası)
 2. Alışveriş Listesi sayfasından eşinizin e-postasını davet edin
-3. Karşı taraf giriş yapıp **Kabul Et** dediğinde aynı listeyi görür
+3. Karşı taraf giriş yapınca **Gelen davetler** bölümünden **Kabul Et** der
 4. Realtime sayesinde eklenen ürünler anında her iki tarafta güncellenir
-
-## Aile Paylaşımı (Ortak Alışveriş Listesi)
-
-1. SQL Editor'de `006_family_sharing.sql` çalıştırın
-2. Alışveriş Listesi sayfasından eşinizin e-postasını davet edin
-3. Karşı taraf giriş yapınca **Kabul Et** der; liste ve stok ortaklaşır
-4. Realtime sayesinde eklenen ürünler anında her iki tarafta görünür
 
 ## Auth Kurulumu
 

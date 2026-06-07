@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Check, Mail, UserPlus, Users, X } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthProvider";
 import { useFamily } from "@/hooks/useFamily";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -20,8 +21,10 @@ export function FamilySharingCard() {
     incoming,
     outgoing,
     loading,
+    invitationsLoading,
     actionLoading,
     error,
+    invitationsError,
     success,
     invite,
     respond,
@@ -30,6 +33,8 @@ export function FamilySharingCard() {
     isAvailable,
     authLoading,
   } = useFamily();
+
+  const { user } = useAuth();
 
   const [email, setEmail] = useState("");
 
@@ -92,12 +97,28 @@ export function FamilySharingCard() {
         </div>
       )}
 
-      {incoming.length > 0 && (
-        <div className="mb-4 space-y-2">
+      <div className="mb-4 space-y-2">
+        <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-bold uppercase tracking-wider text-plum-700">
             Gelen davetler
           </p>
-          {incoming.map((invitation) => (
+          {incoming.length > 0 && (
+            <span className="rounded-full bg-plum-600 px-2 py-0.5 text-[10px] font-bold text-white">
+              {incoming.length}
+            </span>
+          )}
+        </div>
+
+        {invitationsError && (
+          <div className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {invitationsError}
+          </div>
+        )}
+
+        {invitationsLoading ? (
+          <div className="h-14 rounded-xl skeleton-shimmer" />
+        ) : incoming.length > 0 ? (
+          incoming.map((invitation) => (
             <div
               key={invitation.id}
               className="flex flex-col gap-3 rounded-xl border border-plum-200/80 bg-plum-50/60 p-3 sm:flex-row sm:items-center sm:justify-between"
@@ -128,9 +149,20 @@ export function FamilySharingCard() {
                 </Button>
               </div>
             </div>
-          ))}
-        </div>
-      )}
+          ))
+        ) : (
+          <div className="rounded-xl border border-dashed border-plum-200/80 bg-plum-50/30 px-3 py-3 text-sm text-navy-500">
+            {user?.email ? (
+              <>
+                <span className="font-medium text-navy-700">{user.email}</span>{" "}
+                adresine gönderilen davetler burada görünür.
+              </>
+            ) : (
+              "Size gönderilen mutfak davetleri burada görünür."
+            )}
+          </div>
+        )}
+      </div>
 
       <div className="mb-4">
         <p className="mb-2 text-xs font-bold uppercase tracking-wider text-navy-400">

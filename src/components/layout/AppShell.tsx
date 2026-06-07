@@ -1,3 +1,7 @@
+"use client";
+
+import { usePathname } from "next/navigation";
+import { IncomingInvitationBanner } from "@/components/family/IncomingInvitationBanner";
 import { BottomNav } from "@/components/layout/BottomNav";
 import { Header } from "@/components/layout/Header";
 
@@ -16,13 +20,19 @@ export function AppShell({
   badge,
   hideHeader,
 }: AppShellProps) {
+  const pathname = usePathname();
+  const showInvitationBanner = pathname !== "/shopping";
+
   return (
     <div className="app-bg flex min-h-full flex-col">
       {!hideHeader && (
         <Header title={title} subtitle={subtitle} badge={badge} />
       )}
       <main className="relative mx-auto w-full max-w-2xl flex-1 px-4 py-6 pb-32 sm:px-6">
-        <div className="animate-fade-up">{children}</div>
+        <div className="animate-fade-up">
+          {showInvitationBanner && <IncomingInvitationBanner />}
+          {children}
+        </div>
       </main>
       <BottomNav />
     </div>

@@ -12,8 +12,10 @@ export function useFamily() {
   const [members, setMembers] = useState<HomeMember[]>([]);
   const [invitations, setInvitations] = useState<HomeInvitation[]>([]);
   const [loading, setLoading] = useState(true);
+  const [invitationsLoading, setInvitationsLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [invitationsError, setInvitationsError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const supabase = useMemo(() => createClient(), []);
@@ -26,19 +28,32 @@ export function useFamily() {
 
   const refresh = useCallback(async () => {
     setLoading(true);
+    setInvitationsLoading(true);
     setError(null);
-    try {
-      const [memberList, inviteList] = await Promise.all([
-        service.listMembers(),
-        service.listPendingInvitations(),
-      ]);
+    setInvitationsError(null);
+
+    const membersPromise = service.listMembers().then((memberList) => {
       setMembers(memberList);
-      setInvitations(inviteList);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Aile bilgileri yüklenemedi");
-    } finally {
       setLoading(false);
-    }
+    }).catch((e) => {
+      setError(e instanceof Error ? e.message : "Üyeler yüklenemedi");
+      setLoading(false);
+    });
+
+    const invitationsPromise = service.listPendingInvitations().then((inviteList) => {
+      setInvitations(inviteList);
+      setInvitationsLoading(false);
+    }).catch((e) => {
+      const message = e instanceof Error ? e.message : "Davetler yüklenemedi";
+      setInvitationsError(
+        message.includes("get_home_invitations") || message.includes("does not exist")
+          ? "Aile daveti sistemi kurulmamış. Supabase'de 006 ve 007 SQL dosyalarını çalıştırın."
+          : message
+      );
+      setInvitationsLoading(false);
+    });
+
+    await Promise.all([membersPromise, invitationsPromise]);
   }, [service]);
 
   useEffect(() => {
@@ -137,8 +152,10 @@ export function useFamily() {
     incoming,
     outgoing,
     loading,
+    invitationsLoading,
     actionLoading,
     error,
+    invitationsError,
     success,
     invite,
     respond,
