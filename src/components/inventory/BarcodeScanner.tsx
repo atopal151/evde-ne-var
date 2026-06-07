@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Camera, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { BARCODE_PRODUCT_HINTS } from "@/lib/constants";
@@ -11,6 +12,7 @@ interface BarcodeScannerProps {
 }
 
 export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
+  const t = useTranslations("inventory");
   const containerId = useId().replace(/:/g, "");
   const scannerRef = useRef<{ stop: () => Promise<void> } | null>(null);
   const [active, setActive] = useState(false);
@@ -21,7 +23,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
       try {
         await scannerRef.current.stop();
       } catch {
-        /* scanner zaten durmuş olabilir */
+        /* scanner may already be stopped */
       }
       scannerRef.current = null;
     }
@@ -44,29 +46,22 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
           onScan(decodedText);
         },
         () => {
-          /* tarama devam ediyor */
+          /* scan in progress */
         }
       );
     } catch (e) {
       setError(
-        e instanceof Error
-          ? e.message
-          : "Kamera erişimi reddedildi veya desteklenmiyor."
+        e instanceof Error ? e.message : t("cameraError")
       );
       setActive(false);
     }
-  }, [containerId, onScan, stopScanner]);
+  }, [containerId, onScan, stopScanner, t]);
 
   useEffect(() => {
     return () => {
       void stopScanner();
     };
   }, [stopScanner]);
-
-  const handleManualTest = () => {
-    const sample = Object.keys(BARCODE_PRODUCT_HINTS)[0];
-    onScan(sample);
-  };
 
   return (
     <div className="space-y-4">
@@ -75,9 +70,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
         {!active && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-navy-900/90 p-6 text-center text-white">
             <Camera className="h-10 w-10 text-forest-400" />
-            <p className="text-sm text-cream-200">
-              Barkodu kameraya gösterin veya test barkodu kullanın
-            </p>
+            <p className="text-sm text-cream-200">{t("scanHint")}</p>
           </div>
         )}
       </div>
@@ -92,7 +85,7 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
         {!active ? (
           <Button type="button" onClick={() => void startScanner()} className="flex-1">
             <Camera className="h-4 w-4" />
-            Kamerayı Aç
+            {t("openCamera")}
           </Button>
         ) : (
           <Button
@@ -101,12 +94,9 @@ export function BarcodeScanner({ onScan, onClose }: BarcodeScannerProps) {
             onClick={() => void stopScanner()}
             className="flex-1 border-white/20 text-navy-800"
           >
-            Taramayı Durdur
+            {t("stopScanning")}
           </Button>
         )}
-        <Button type="button" variant="secondary" onClick={handleManualTest}>
-          Test Barkodu
-        </Button>
         {onClose && (
           <Button type="button" variant="ghost" onClick={onClose}>
             <X className="h-4 w-4" />

@@ -95,6 +95,19 @@ Ana sayfada **yeşil "Supabase bağlı"** banner'ı görünmeli; badge **Bulut**
    - **Site URL:** `https://SIZIN-URL.vercel.app`
    - **Redirect URLs:** `https://SIZIN-URL.vercel.app/auth/callback`
 
+## Dil Desteği (i18n)
+
+Uygulama **8 dil** destekler: Türkçe, İngilizce, Almanca, Rusça, Çince, Arapça (RTL), Fransızca, İspanyolca.
+
+| Öğe | Konum |
+|-----|--------|
+| Çeviri dosyaları | `src/messages/{tr,en,de,ru,zh,ar,fr,es}.json` |
+| Yapılandırma | `src/i18n/config.ts`, `src/i18n/request.ts` |
+| Dil tercihi | `NEXT_LOCALE` çerezi (Ayarlar → Dil) |
+| İlk ziyaret | Tarayıcı `Accept-Language` başlığından otomatik seçim |
+
+URL yapısı değişmez (`/shopping` hem TR hem EN için aynı). Gemini tarif istekleri seçili dile göre prompt alır.
+
 ## Proje Yapısı
 
 ```
@@ -102,6 +115,8 @@ src/
 ├── app/                 # Next.js sayfaları + API routes
 ├── components/          # UI, auth, brand (Logo)
 ├── hooks/
+├── i18n/                # next-intl yapılandırması
+├── messages/            # TR / EN çeviri dosyaları
 ├── lib/brand.ts         # Uygulama adı ve meta
 ├── services/            # Mock + Supabase servisleri
 └── types/

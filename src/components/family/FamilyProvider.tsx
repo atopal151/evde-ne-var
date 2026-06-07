@@ -9,6 +9,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { useTranslations } from "next-intl";
 import { useAuth, useResolvedHomeId } from "@/components/auth/AuthProvider";
 import { createClient } from "@/lib/supabase/client";
 import { createFamilyService, shouldUseMockData } from "@/services";
@@ -37,6 +38,8 @@ interface FamilyContextValue {
 const FamilyContext = createContext<FamilyContextValue | null>(null);
 
 export function FamilyProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations("family");
+  const tErrors = useTranslations("family.errors");
   const { user, refreshProfile } = useAuth();
   const { ready, authLoading } = useResolvedHomeId();
   const [members, setMembers] = useState<HomeMember[]>([]);
@@ -69,7 +72,9 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         setLoading(false);
       })
       .catch((e) => {
-        setError(e instanceof Error ? e.message : "Üyeler yüklenemedi");
+        setError(
+          e instanceof Error ? e.message : tErrors("membersLoadFailed")
+        );
         setLoading(false);
       });
 
@@ -80,18 +85,19 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         setInvitationsLoading(false);
       })
       .catch((e) => {
-        const message = e instanceof Error ? e.message : "Davetler yüklenemedi";
+        const message =
+          e instanceof Error ? e.message : tErrors("invitesLoadFailed");
         setInvitationsError(
           message.includes("get_home_invitations") ||
             message.includes("does not exist")
-            ? "Aile daveti sistemi kurulmamış. Supabase'de 006 ve 008 SQL dosyalarını çalıştırın."
+            ? tErrors("migrationRequired")
             : message
         );
         setInvitationsLoading(false);
       });
 
     await Promise.all([membersPromise, invitationsPromise]);
-  }, [service]);
+  }, [service, tErrors]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -128,17 +134,15 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
       setSuccess(null);
       try {
         await service.inviteByEmail(email);
-        setSuccess(
-          "Davet gönderildi. Karşı taraf onaylayınca listeyi birlikte görürsünüz."
-        );
+        setSuccess(t("inviteSent"));
         await refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Davet gönderilemedi");
+        setError(e instanceof Error ? e.message : tErrors("inviteFailed"));
       } finally {
         setActionLoading(false);
       }
     },
-    [service, refresh]
+    [service, refresh, t, tErrors]
   );
 
   const respond = useCallback(
@@ -150,20 +154,18 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
         await service.respondToInvitation(invitationId, accept);
         if (accept) {
           await refreshProfile();
-          setSuccess(
-            "Daveti kabul ettiniz. Artık ortak alışveriş listesini görüyorsunuz."
-          );
+          setSuccess(t("inviteAccepted"));
         } else {
-          setSuccess("Davet reddedildi.");
+          setSuccess(t("inviteRejected"));
         }
         await refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "İşlem tamamlanamadı");
+        setError(e instanceof Error ? e.message : tErrors("actionFailed"));
       } finally {
         setActionLoading(false);
       }
     },
-    [service, refresh, refreshProfile]
+    [service, refresh, refreshProfile, t, tErrors]
   );
 
   const cancel = useCallback(
@@ -173,15 +175,15 @@ export function FamilyProvider({ children }: { children: ReactNode }) {
       setSuccess(null);
       try {
         await service.cancelInvitation(invitationId);
-        setSuccess("Davet iptal edildi.");
+        setSuccess(t("inviteCancelled"));
         await refresh();
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Davet iptal edilemedi");
+        setError(e instanceof Error ? e.message : tErrors("cancelFailed"));
       } finally {
         setActionLoading(false);
       }
     },
-    [service, refresh]
+    [service, refresh, t, tErrors]
   );
 
   const incoming = invitations.filter((i) => i.direction === "incoming");

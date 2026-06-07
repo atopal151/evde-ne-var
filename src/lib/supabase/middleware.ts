@@ -1,5 +1,9 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import {
+  localeCookieOptions,
+  resolveInitialLocale,
+} from "@/lib/i18n/locale-cookie";
 
 const PUBLIC_PATHS = ["/login", "/register", "/auth"];
 
@@ -15,7 +19,7 @@ export async function updateSession(request: NextRequest) {
   const useMock = process.env.NEXT_PUBLIC_USE_MOCK_DATA === "true";
 
   if (useMock || !url || !key) {
-    return NextResponse.next({ request });
+    return applyLocaleCookie(request, NextResponse.next({ request }));
   }
 
   let supabaseResponse = NextResponse.next({ request });
@@ -49,14 +53,39 @@ export async function updateSession(request: NextRequest) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(redirectUrl);
+    return applyLocaleCookie(
+      request,
+      NextResponse.redirect(redirectUrl)
+    );
   }
 
   if (user && (pathname === "/login" || pathname === "/register")) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/";
-    return NextResponse.redirect(redirectUrl);
+    return applyLocaleCookie(
+      request,
+      NextResponse.redirect(redirectUrl)
+    );
   }
 
-  return supabaseResponse;
+  return applyLocaleCookie(request, supabaseResponse);
+}
+
+function applyLocaleCookie(
+  request: NextRequest,
+  response: NextResponse
+): NextResponse {
+  if (!request.cookies.get(localeCookieOptions.name)) {
+    const locale = resolveInitialLocale(
+      undefined,
+      request.headers.get("accept-language")
+    );
+    response.cookies.set(
+      localeCookieOptions.name,
+      locale,
+      localeCookieOptions
+    );
+  }
+
+  return response;
 }

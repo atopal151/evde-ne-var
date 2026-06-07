@@ -1,6 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useLocale } from "next-intl";
+import type { Locale } from "@/i18n/config";
 import { useAuth } from "@/components/auth/AuthProvider";
 import {
   appendRecipesToHistory,
@@ -14,6 +16,7 @@ import type { InventoryItem } from "@/types/database";
 import type { RecipeResponse } from "@/types/recipes";
 
 export function useRecipes() {
+  const locale = useLocale() as Locale;
   const { user } = useAuth();
   const scope = user?.id ?? "guest";
 
@@ -44,7 +47,7 @@ export function useRecipes() {
         const response = await fetch("/api/recipes/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ items }),
+          body: JSON.stringify({ items, locale }),
         });
 
         const data = (await response.json()) as RecipeResponse & {
@@ -72,7 +75,7 @@ export function useRecipes() {
         setLoading(false);
       }
     },
-    [scope]
+    [scope, locale]
   );
 
   const clear = useCallback(() => {

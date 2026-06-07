@@ -2,9 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function AuthTabs() {
   const pathname = usePathname();
+  const t = useTranslations("auth");
   const isLogin = pathname === "/login";
   const isRegister = pathname === "/register";
 
@@ -20,10 +22,10 @@ export function AuthTabs() {
     <div className="mb-6 rounded-xl bg-cream-200 p-1">
       <div className="flex">
         <Link href="/login" className={tabClass(isLogin)}>
-          Giriş Yap
+          {t("loginTab")}
         </Link>
         <Link href="/register" className={tabClass(isRegister)}>
-          Kayıt Ol
+          {t("registerTab")}
         </Link>
       </div>
     </div>

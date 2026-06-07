@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { CheckCircle2, AlertTriangle, KeyRound, Loader2 } from "lucide-react";
 import type { GeminiKeyStatus } from "@/lib/gemini/validateApiKey";
 
@@ -39,7 +40,16 @@ const styles: Record<
   },
 };
 
+const statusTitleKeys: Record<GeminiKeyStatus | "loading", string> = {
+  loading: "geminiLoading",
+  ok: "geminiOk",
+  missing: "geminiMissing",
+  invalid: "geminiInvalid",
+  quota: "geminiQuota",
+};
+
 export function GeminiStatusBanner({ status, message }: GeminiStatusBannerProps) {
+  const t = useTranslations("recipes");
   const style = styles[status];
   const Icon = style.icon;
 
@@ -60,13 +70,7 @@ export function GeminiStatusBanner({ status, message }: GeminiStatusBannerProps)
         aria-hidden
       />
       <div>
-        <p className="font-semibold">
-          {status === "loading" && "Gemini bağlantısı kontrol ediliyor..."}
-          {status === "ok" && "Gemini bağlı — API key çalışıyor"}
-          {status === "missing" && "Demo mod — API key yok"}
-          {status === "invalid" && "API key hatalı — demo tarifler kullanılıyor"}
-          {status === "quota" && "Ücretsiz kota dolmuş — demo tarifler kullanılabilir"}
-        </p>
+        <p className="font-semibold">{t(statusTitleKeys[status])}</p>
         <p className="mt-0.5 opacity-90">{message}</p>
       </div>
     </div>

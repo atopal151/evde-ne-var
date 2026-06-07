@@ -1,7 +1,14 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import { AppProviders } from "@/components/providers/AppProviders";
-import { APP_DESCRIPTION, APP_NAME } from "@/lib/brand";
+import {
+  isRtlLocale,
+  openGraphLocales,
+  type Locale,
+} from "@/i18n/config";
+import { APP_LOGO_PATH } from "@/lib/brand";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,25 +21,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: `${APP_NAME} | Akıllı Tarif Asistanı`,
-    template: `%s | ${APP_NAME}`,
-  },
-  description: APP_DESCRIPTION,
-  applicationName: APP_NAME,
-  icons: {
-    icon: [{ url: "/logo.png", type: "image/png" }],
-    apple: [{ url: "/logo.png", type: "image/png" }],
-  },
-  openGraph: {
-    title: APP_NAME,
-    description: APP_DESCRIPTION,
-    type: "website",
-    locale: "tr_TR",
-  },
-  manifest: "/manifest.json",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("brand");
+  const appName = t("appName");
+
+  return {
+    title: {
+      default: `${appName} | ${t("metaTitle")}`,
+      template: `%s | ${appName}`,
+    },
+    description: t("description"),
+    applicationName: appName,
+    icons: {
+      icon: [{ url: APP_LOGO_PATH, type: "image/png" }],
+      apple: [{ url: APP_LOGO_PATH, type: "image/png" }],
+    },
+    openGraph: {
+      title: appName,
+      description: t("description"),
+      type: "website",
+      locale: openGraphLocales[(await getLocale()) as Locale] ?? "tr_TR",
+    },
+    manifest: "/manifest.json",
+  };
+}
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -40,14 +52,18 @@ export const viewport: Viewport = {
   themeColor: "#1b4332",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const locale = (await getLocale()) as Locale;
+  const messages = await getMessages();
+
   return (
     <html
-      lang="tr"
+      lang={locale}
+      dir={isRtlLocale(locale) ? "rtl" : "ltr"}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
@@ -55,7 +71,9 @@ export default function RootLayout({
         className="min-h-full flex flex-col"
         suppressHydrationWarning
       >
-        <AppProviders>{children}</AppProviders>
+        <NextIntlClientProvider messages={messages}>
+          <AppProviders>{children}</AppProviders>
+        </NextIntlClientProvider>
       </body>
     </html>
   );

@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Bell } from "lucide-react";
 import { useFamily } from "@/hooks/useFamily";
 
 export function IncomingInvitationBanner() {
+  const t = useTranslations("family");
   const { incoming, invitationsLoading, isAvailable, authLoading } = useFamily();
 
   if (authLoading || !isAvailable || invitationsLoading || incoming.length === 0) {
@@ -21,11 +23,9 @@ export function IncomingInvitationBanner() {
       </div>
       <div className="min-w-0 flex-1">
         <p className="font-semibold text-navy-900">
-          {incoming.length} mutfak daveti bekliyor
+          {t("bannerTitle", { count: incoming.length })}
         </p>
-        <p className="text-xs text-navy-500">
-          Ayarlar sayfasından kabul edebilirsiniz
-        </p>
+        <p className="text-xs text-navy-500">{t("bannerSubtitle")}</p>
       </div>
       <span className="shrink-0 rounded-full bg-plum-600 px-2.5 py-1 text-xs font-bold text-white">
         {incoming.length}

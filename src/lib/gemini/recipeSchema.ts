@@ -20,6 +20,9 @@ export const recipeResponseSchema = z.object({
 });
 
 export const generateRecipesRequestSchema = z.object({
+  locale: z
+    .enum(["tr", "en", "de", "ru", "zh", "ar", "fr", "es"])
+    .optional(),
   items: z.array(
     z.object({
       id: z.string(),

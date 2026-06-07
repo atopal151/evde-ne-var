@@ -1,6 +1,10 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 import { ExpirationBadge } from "@/components/inventory/ExpirationBadge";
 import { getCategoryVisual } from "@/lib/constants/categoryVisuals";
+import { getCategoryLabel } from "@/lib/i18n/category";
 import type { InventoryItem } from "@/types/database";
 
 interface InventoryCardProps {
@@ -9,6 +13,8 @@ interface InventoryCardProps {
 }
 
 export function InventoryCard({ item, onDelete }: InventoryCardProps) {
+  const t = useTranslations("inventory");
+  const tCategories = useTranslations("categories");
   const visual = getCategoryVisual(item.category);
 
   return (
@@ -33,7 +39,7 @@ export function InventoryCard({ item, onDelete }: InventoryCardProps) {
                 visual.accent,
               ].join(" ")}
             >
-              {item.category}
+              {getCategoryLabel(item.category, tCategories)}
             </span>
           </div>
           {onDelete && (
@@ -41,7 +47,7 @@ export function InventoryCard({ item, onDelete }: InventoryCardProps) {
               type="button"
               onClick={() => onDelete(item.id)}
               className="shrink-0 rounded-xl p-2 text-navy-400 transition-colors hover:bg-red-50 hover:text-red-600 active:bg-red-100 active:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200"
-              aria-label={`${item.product_name} sil`}
+              aria-label={t("deleteProduct", { name: item.product_name })}
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -57,7 +63,7 @@ export function InventoryCard({ item, onDelete }: InventoryCardProps) {
 
         {item.barcode && (
           <p className="mt-2 font-mono text-xs text-navy-400">
-            Barkod: {item.barcode}
+            {t("barcodePrefix")} {item.barcode}
           </p>
         )}
       </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Loader2, LogOut } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 
@@ -22,19 +23,25 @@ function getInitials(
 
 function getDisplayName(
   fullName: string | null | undefined,
-  email: string | undefined
+  email: string | undefined,
+  fallback: string
 ): string {
   if (fullName?.trim()) return fullName.trim();
-  return email?.split("@")[0] ?? "Hesap";
+  return email?.split("@")[0] ?? fallback;
 }
 
 export function AuthHeaderActions() {
+  const t = useTranslations("auth");
   const { user, profile, isMockMode, signOut } = useAuth();
   const [signingOut, setSigningOut] = useState(false);
 
   if (isMockMode || !user) return null;
 
-  const displayName = getDisplayName(profile?.full_name, user.email);
+  const displayName = getDisplayName(
+    profile?.full_name,
+    user.email,
+    t("account")
+  );
   const initials = getInitials(profile?.full_name, user.email);
   const email = user.email ?? "";
 
@@ -50,7 +57,7 @@ export function AuthHeaderActions() {
   return (
     <div
       className="flex shrink-0 items-center gap-1 rounded-2xl border border-white/15 bg-white/10 p-1 shadow-lg shadow-black/10 backdrop-blur-md"
-      aria-label="Oturum bilgisi"
+      aria-label={t("sessionInfo")}
     >
       <div className="flex min-w-0 items-center gap-2.5 py-0.5 pl-1.5 pr-1 sm:pr-2">
         <div
@@ -77,8 +84,8 @@ export function AuthHeaderActions() {
         type="button"
         onClick={() => void handleSignOut()}
         disabled={signingOut}
-        title="Çıkış"
-        aria-label="Çıkış yap"
+        title={t("signOutTitle")}
+        aria-label={t("signOut")}
         className="inline-flex h-9 min-w-9 items-center justify-center gap-1.5 rounded-xl px-2.5 text-cream-100 transition-all hover:bg-white/15 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 disabled:opacity-60 sm:px-3"
       >
         {signingOut ? (
@@ -87,7 +94,7 @@ export function AuthHeaderActions() {
           <LogOut className="h-4 w-4" />
         )}
         <span className="hidden text-xs font-medium md:inline">
-          {signingOut ? "Çıkılıyor..." : "Çıkış"}
+          {signingOut ? t("signingOut") : t("signOut")}
         </span>
       </button>
     </div>

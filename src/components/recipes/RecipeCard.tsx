@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Clock, ChefHat, Sparkles } from "lucide-react";
 import { Card } from "@/components/ui/Card";
 import type { Recipe } from "@/types/recipes";
@@ -16,6 +19,8 @@ const matchTone = (rate: string) => {
 };
 
 export function RecipeCard({ recipe, onSelect, isNew }: RecipeCardProps) {
+  const t = useTranslations("recipes");
+
   return (
     <Card
       padding="md"
@@ -51,7 +56,7 @@ export function RecipeCard({ recipe, onSelect, isNew }: RecipeCardProps) {
               </h3>
               {isNew && (
                 <span className="shrink-0 rounded-full bg-forest-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-forest-700">
-                  Yeni
+                  {t("newBadge")}
                 </span>
               )}
             </div>
@@ -72,7 +77,7 @@ export function RecipeCard({ recipe, onSelect, isNew }: RecipeCardProps) {
 
           {recipe.required_extra_ingredients.length > 0 && (
             <p className="mt-2 rounded-lg bg-cream-100/80 px-2 py-1 text-xs text-navy-600">
-              <span className="font-medium text-navy-700">Eksik: </span>
+              <span className="font-medium text-navy-700">{t("missingPrefix")} </span>
               {recipe.required_extra_ingredients.join(", ")}
             </p>
           )}

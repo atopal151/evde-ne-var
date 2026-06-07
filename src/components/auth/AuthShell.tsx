@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import { AuthShowcase } from "@/components/auth/AuthShowcase";
 import { AuthTabs } from "@/components/auth/AuthTabs";
@@ -10,6 +13,14 @@ interface AuthShellProps {
 }
 
 export function AuthShell({ title, subtitle, children }: AuthShellProps) {
+  const t = useTranslations("nav");
+
+  const mobileFeatures = [
+    { icon: Package, label: t("stock") },
+    { icon: ChefHat, label: t("recipesShort") },
+    { icon: ShoppingCart, label: t("list") },
+  ];
+
   return (
     <div className="min-h-full lg:grid lg:grid-cols-2">
       <AuthShowcase />
@@ -33,11 +44,7 @@ export function AuthShell({ title, subtitle, children }: AuthShellProps) {
           <AuthTabs />
 
           <div className="mb-6 flex flex-wrap gap-2 lg:hidden">
-            {[
-              { icon: Package, label: "Stok" },
-              { icon: ChefHat, label: "Tarif" },
-              { icon: ShoppingCart, label: "Liste" },
-            ].map(({ icon: Icon, label }) => (
+            {mobileFeatures.map(({ icon: Icon, label }) => (
               <span
                 key={label}
                 className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 text-xs font-medium text-navy-700 shadow-sm"

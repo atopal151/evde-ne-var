@@ -121,7 +121,10 @@ function buildFallback(item: InventoryItem): Recipe {
 }
 
 export class MockRecipeService implements IRecipeService {
-  async generate(inventory: InventoryItem[]): Promise<RecipeResponse> {
+  async generate(
+    inventory: InventoryItem[],
+    _locale?: import("@/i18n/config").Locale
+  ): Promise<RecipeResponse> {
     if (inventory.length === 0) {
       throw new Error("Stok boş — önce malzeme ekleyin");
     }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Check, Mail, UserPlus, Users, X } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { useFamily } from "@/hooks/useFamily";
@@ -16,6 +17,8 @@ function memberInitials(name: string): string {
 }
 
 export function FamilySharingCard() {
+  const t = useTranslations("family");
+  const tCommon = useTranslations("common");
   const {
     members,
     incoming,
@@ -35,7 +38,6 @@ export function FamilySharingCard() {
   } = useFamily();
 
   const { user } = useAuth();
-
   const [email, setEmail] = useState("");
 
   if (authLoading) {
@@ -49,10 +51,7 @@ export function FamilySharingCard() {
   if (!isAvailable) {
     return (
       <Card padding="lg" className="mb-6 border-amber-200/80 bg-amber-50/50">
-        <p className="text-sm text-amber-900">
-          Aile paylaşımı için giriş yapın. Eşinizi davet edip onayladıktan sonra
-          alışveriş listesini birlikte görürsünüz.
-        </p>
+        <p className="text-sm text-amber-900">{t("loginRequired")}</p>
       </Card>
     );
   }
@@ -72,15 +71,10 @@ export function FamilySharingCard() {
           <Users className="h-5 w-5" />
         </div>
         <div>
-          <h2 className="text-base font-bold text-navy-900">Aile Mutfağı</h2>
-          <p className="mt-0.5 text-sm text-navy-500">
-            Eşinizi veya aile bireyini davet edin. Onayladıktan sonra alışveriş
-            listesi ortak görünür.
-          </p>
+          <h2 className="text-base font-bold text-navy-900">{t("title")}</h2>
+          <p className="mt-0.5 text-sm text-navy-500">{t("description")}</p>
           {isMockMode && (
-            <p className="mt-1 text-xs text-plum-600">
-              Demo mod: davetler tarayıcıda simüle edilir.
-            </p>
+            <p className="mt-1 text-xs text-plum-600">{t("mockNote")}</p>
           )}
         </div>
       </div>
@@ -100,7 +94,7 @@ export function FamilySharingCard() {
       <div className="mb-4 space-y-2">
         <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-bold uppercase tracking-wider text-plum-700">
-            Gelen davetler
+            {t("incoming")}
           </p>
           {incoming.length > 0 && (
             <span className="rounded-full bg-plum-600 px-2 py-0.5 text-[10px] font-bold text-white">
@@ -125,7 +119,7 @@ export function FamilySharingCard() {
             >
               <div>
                 <p className="text-sm font-semibold text-navy-900">
-                  {invitation.inviter_name} sizi mutfağına davet ediyor
+                  {t("invitationFrom", { name: invitation.inviter_name })}
                 </p>
                 <p className="text-xs text-navy-500">{invitation.home_name}</p>
               </div>
@@ -136,7 +130,7 @@ export function FamilySharingCard() {
                   disabled={actionLoading}
                 >
                   <Check className="h-4 w-4" />
-                  Kabul Et
+                  {tCommon("accept")}
                 </Button>
                 <Button
                   size="sm"
@@ -145,28 +139,23 @@ export function FamilySharingCard() {
                   disabled={actionLoading}
                 >
                   <X className="h-4 w-4" />
-                  Reddet
+                  {tCommon("reject")}
                 </Button>
               </div>
             </div>
           ))
         ) : (
           <div className="rounded-xl border border-dashed border-plum-200/80 bg-plum-50/30 px-3 py-3 text-sm text-navy-500">
-            {user?.email ? (
-              <>
-                <span className="font-medium text-navy-700">{user.email}</span>{" "}
-                adresine gönderilen davetler burada görünür.
-              </>
-            ) : (
-              "Size gönderilen mutfak davetleri burada görünür."
-            )}
+            {user?.email
+              ? t("incomingEmptyWithEmail", { email: user.email })
+              : t("incomingEmpty")}
           </div>
         )}
       </div>
 
       <div className="mb-4">
         <p className="mb-2 text-xs font-bold uppercase tracking-wider text-navy-400">
-          Mutfak üyeleri
+          {t("members")}
         </p>
         {loading ? (
           <div className="h-12 rounded-xl skeleton-shimmer" />
@@ -187,7 +176,7 @@ export function FamilySharingCard() {
                   <p className="truncate text-xs text-navy-500">{member.email}</p>
                 </div>
                 <span className="shrink-0 rounded-full bg-white px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-navy-500">
-                  {member.role === "owner" ? "Sahip" : "Üye"}
+                  {member.role === "owner" ? t("roleOwner") : t("roleMember")}
                 </span>
               </li>
             ))}
@@ -198,7 +187,7 @@ export function FamilySharingCard() {
       {outgoing.length > 0 && (
         <div className="mb-4 space-y-2">
           <p className="text-xs font-bold uppercase tracking-wider text-navy-400">
-            Bekleyen davetler
+            {t("outgoing")}
           </p>
           {outgoing.map((invitation) => (
             <div
@@ -209,7 +198,7 @@ export function FamilySharingCard() {
                 <p className="truncate text-sm font-medium text-navy-800">
                   {invitation.invitee_email}
                 </p>
-                <p className="text-xs text-navy-400">Onay bekliyor</p>
+                <p className="text-xs text-navy-400">{t("pendingApproval")}</p>
               </div>
               <Button
                 size="sm"
@@ -217,7 +206,7 @@ export function FamilySharingCard() {
                 onClick={() => void cancel(invitation.id)}
                 disabled={actionLoading}
               >
-                İptal
+                {tCommon("cancel")}
               </Button>
             </div>
           ))}
@@ -226,12 +215,12 @@ export function FamilySharingCard() {
 
       <form onSubmit={(e) => void handleInvite(e)} className="space-y-3">
         <Input
-          label="Aile bireyi e-postası"
+          label={t("inviteEmail")}
           name="invite_email"
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="es@ornek.com"
+          placeholder={t("invitePlaceholder")}
           required
         />
         <Button
@@ -241,12 +230,11 @@ export function FamilySharingCard() {
           disabled={actionLoading || !email.trim()}
         >
           <UserPlus className="h-4 w-4" />
-          {actionLoading ? "Gönderiliyor..." : "Davet Gönder"}
+          {actionLoading ? t("sendingInvite") : t("sendInvite")}
         </Button>
         <p className="flex items-start gap-2 text-xs text-navy-400">
           <Mail className="mt-0.5 h-3.5 w-3.5 shrink-0" />
-          Davet edilen kişinin uygulamada kayıtlı olması gerekir. Kabul edince
-          stok ve alışveriş listesi ortaklaşır.
+          {t("inviteHint")}
         </p>
       </form>
     </Card>

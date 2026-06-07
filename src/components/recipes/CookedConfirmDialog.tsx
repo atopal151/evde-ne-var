@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { AlertTriangle, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import {
@@ -23,6 +24,8 @@ export function CookedConfirmDialog({
   onConfirm,
   onClose,
 }: CookedConfirmDialogProps) {
+  const t = useTranslations("recipes");
+  const tCommon = useTranslations("common");
   const unmatched = hasUnmatchedIngredients(deductions);
   const insufficient = hasInsufficientStock(deductions);
   const canConfirm = !unmatched && !insufficient;
@@ -38,7 +41,7 @@ export function CookedConfirmDialog({
         <div className="flex items-start justify-between border-b border-cream-300 px-5 py-4">
           <div>
             <h2 id="cooked-dialog-title" className="text-lg font-bold text-navy-900">
-              Stoktan düşülsün mü?
+              {t("cookedTitle")}
             </h2>
             <p className="mt-0.5 text-sm text-navy-500">{recipeName}</p>
           </div>
@@ -46,7 +49,7 @@ export function CookedConfirmDialog({
             type="button"
             onClick={onClose}
             className="rounded-lg p-1.5 text-navy-400 hover:bg-cream-200"
-            aria-label="Kapat"
+            aria-label={tCommon("close")}
           >
             <X className="h-5 w-5" />
           </button>
@@ -68,10 +71,10 @@ export function CookedConfirmDialog({
               >
                 <span>{d.product_name}</span>
                 <span className="font-medium">
-                  −{d.amount} {d.unit}
+                  {t("deductionFormat", { amount: d.amount, unit: d.unit })}
                   {d.matched && (
                     <span className="ml-1 text-xs opacity-70">
-                      (stok: {d.currentQuantity})
+                      {t("stockHint", { qty: d.currentQuantity })}
                     </span>
                   )}
                 </span>
@@ -82,28 +85,28 @@ export function CookedConfirmDialog({
           {unmatched && (
             <div className="flex items-start gap-2 rounded-xl bg-red-50 p-3 text-sm text-red-700">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-              Bazı malzemeler stokta bulunamadı. Stok adlarını kontrol edin.
+              {t("unmatchedWarning")}
             </div>
           )}
 
           {insufficient && !unmatched && (
             <div className="flex items-start gap-2 rounded-xl bg-orange-50 p-3 text-sm text-orange-700">
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
-              Bazı malzemeler için stok yetersiz.
+              {t("insufficientWarning")}
             </div>
           )}
         </div>
 
         <div className="flex gap-2 border-t border-cream-300 px-5 py-4">
           <Button variant="ghost" fullWidth onClick={onClose} disabled={submitting}>
-            Vazgeç
+            {tCommon("cancel")}
           </Button>
           <Button
             fullWidth
             onClick={onConfirm}
             disabled={!canConfirm || submitting}
           >
-            {submitting ? "Düşülüyor..." : "Onayla"}
+            {submitting ? t("deducting") : tCommon("confirm")}
           </Button>
         </div>
       </div>

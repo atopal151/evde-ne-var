@@ -4,6 +4,7 @@ import {
   normalizeGeminiKey,
 } from "@/lib/gemini/config";
 import { isQuotaError } from "@/lib/gemini/validateApiKey";
+import type { Locale } from "@/i18n/config";
 import { buildRecipePrompt } from "@/lib/gemini/prompt";
 import { recipeResponseSchema } from "@/lib/gemini/recipeSchema";
 import type { InventoryItem } from "@/types/database";
@@ -27,7 +28,10 @@ function parseRecipeResponse(text: string): RecipeResponse {
 }
 
 export class GeminiRecipeService implements IRecipeService {
-  async generate(inventory: InventoryItem[]): Promise<RecipeResponse> {
+  async generate(
+    inventory: InventoryItem[],
+    locale: Locale = "tr"
+  ): Promise<RecipeResponse> {
     const apiKey = normalizeGeminiKey(process.env.GEMINI_API_KEY);
     if (!apiKey) {
       throw new Error("GEMINI_API_KEY tanımlı değil");
@@ -38,7 +42,7 @@ export class GeminiRecipeService implements IRecipeService {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const prompt = buildRecipePrompt(inventory);
+    const prompt = buildRecipePrompt(inventory, locale);
     const models = getGeminiModelCandidates();
     let lastQuotaError: Error | null = null;
 

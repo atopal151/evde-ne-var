@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { RefreshCw, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ShoppingIllustration } from "@/components/illustrations/KitchenIllustrations";
@@ -12,6 +13,8 @@ import { PageSection } from "@/components/ui/PageSection";
 import { useShoppingList } from "@/hooks/useShoppingList";
 
 export default function ShoppingPage() {
+  const t = useTranslations("shopping");
+  const tCommon = useTranslations("common");
   const {
     pending,
     completed,
@@ -25,23 +28,23 @@ export default function ShoppingPage() {
   } = useShoppingList();
 
   return (
-    <AppShell
-      title="Alışveriş Listesi"
-      subtitle="Eksik malzemeleri takip edin"
-    >
+    <AppShell title={t("title")} subtitle={t("subtitle")}>
       <PageSection
-        title="Listem"
+        title={t("myList")}
         subtitle={
           loading
-            ? "Yükleniyor..."
-            : `${pending.length} alınacak · ${completed.length} tamamlandı`
+            ? tCommon("loading")
+            : t("summary", {
+                pending: pending.length,
+                completed: completed.length,
+              })
         }
         actions={
           <Button
             variant="ghost"
             size="sm"
             onClick={() => void refresh()}
-            aria-label="Yenile"
+            aria-label={tCommon("refresh")}
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
@@ -71,8 +74,8 @@ export default function ShoppingPage() {
       ) : pending.length === 0 && completed.length === 0 ? (
         <EmptyState
           illustration={<ShoppingIllustration className="h-36 w-36" />}
-          title="Alışveriş listeniz boş"
-          description="Tariflerdeki eksik malzemeleri veya ihtiyaçlarınızı ekleyin. Markete giderken yanınızda taşıyın."
+          title={t("emptyTitle")}
+          description={t("emptyDescription")}
         />
       ) : (
         <div className="space-y-6">
@@ -81,7 +84,7 @@ export default function ShoppingPage() {
               <div className="mb-3 flex items-center gap-2">
                 <span className="h-1.5 w-1.5 rounded-full bg-forest-500" />
                 <h3 className="text-sm font-bold uppercase tracking-wider text-forest-700">
-                  Alınacaklar
+                  {t("pending")}
                 </h3>
                 <span className="rounded-full bg-forest-100 px-2 py-0.5 text-xs font-medium text-forest-700">
                   {pending.length}
@@ -106,7 +109,7 @@ export default function ShoppingPage() {
                 <div className="flex items-center gap-2">
                   <span className="h-1.5 w-1.5 rounded-full bg-navy-300" />
                   <h3 className="text-sm font-bold uppercase tracking-wider text-navy-400">
-                    Tamamlananlar
+                    {t("completed")}
                   </h3>
                 </div>
                 <Button
@@ -115,7 +118,7 @@ export default function ShoppingPage() {
                   onClick={() => void clearCompleted()}
                 >
                   <Trash2 className="h-3.5 w-3.5" />
-                  Temizle
+                  {tCommon("clear")}
                 </Button>
               </div>
               <ul className="space-y-2">

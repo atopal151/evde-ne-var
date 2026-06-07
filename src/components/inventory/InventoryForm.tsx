@@ -1,23 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { z } from "zod";
+import { useTranslations } from "next-intl";
 import { Barcode, PenLine } from "lucide-react";
 import { BarcodeScanner } from "@/components/inventory/BarcodeScanner";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { INVENTORY_UNITS, PRODUCT_CATEGORIES } from "@/lib/constants";
+import { getCategoryLabel } from "@/lib/i18n/category";
 import type { CreateInventoryInput, InventoryUnit, ProductCategory } from "@/types/database";
-
-const schema = z.object({
-  product_name: z.string().min(1, "Ürün adı gerekli"),
-  quantity: z.coerce.number().positive("Miktar 0'dan büyük olmalı"),
-  unit: z.string(),
-  category: z.string(),
-  expiration_date: z.string().optional(),
-  barcode: z.string().optional(),
-});
 
 interface InventoryFormProps {
   onSubmit: (input: CreateInventoryInput) => Promise<void>;
@@ -27,6 +20,22 @@ interface InventoryFormProps {
 type Tab = "manual" | "barcode";
 
 export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) {
+  const t = useTranslations("inventory");
+  const tCategories = useTranslations("categories");
+
+  const schema = useMemo(
+    () =>
+      z.object({
+        product_name: z.string().min(1, t("validationName")),
+        quantity: z.coerce.number().positive(t("validationQuantity")),
+        unit: z.string(),
+        category: z.string(),
+        expiration_date: z.string().optional(),
+        barcode: z.string().optional(),
+      }),
+    [t]
+  );
+
   const [tab, setTab] = useState<Tab>(initialBarcode ? "barcode" : "manual");
   const [showScanner, setShowScanner] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -71,7 +80,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
           category: data.product!.category,
           unit: data.product!.unit,
         }));
-        setLookupMessage(`"${data.product.name}" otomatik dolduruldu.`);
+        setLookupMessage(t("lookupFound", { name: data.product.name }));
         return;
       }
 
@@ -79,15 +88,13 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
         ...prev,
         barcode: barcode.replace(/\D/g, "") || barcode,
       }));
-      setLookupMessage(
-        "Bu barkod veritabanında bulunamadı. Ürün adını el ile girebilirsiniz."
-      );
+      setLookupMessage(t("lookupNotFound"));
     } catch {
       setForm((prev) => ({
         ...prev,
         barcode: barcode.replace(/\D/g, "") || barcode,
       }));
-      setLookupMessage("Ürün araması başarısız. Bilgileri el ile girebilirsiniz.");
+      setLookupMessage(t("lookupFailed"));
     } finally {
       setLookupLoading(false);
     }
@@ -150,7 +157,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
           ].join(" ")}
         >
           <PenLine className="h-4 w-4" />
-          El ile Giriş
+          {t("tabManual")}
         </button>
         <button
           type="button"
@@ -166,7 +173,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
           ].join(" ")}
         >
           <Barcode className="h-4 w-4" />
-          Barkod Tara
+          {t("tabBarcode")}
         </button>
       </div>
 
@@ -179,7 +186,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
 
       {lookupLoading && (
         <p className="rounded-xl bg-forest-50 px-3 py-2 text-sm text-forest-800">
-          Barkod aranıyor…
+          {t("lookupSearching")}
         </p>
       )}
 
@@ -191,20 +198,20 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
 
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
         <Input
-          label="Ürün Adı"
+          label={t("productName")}
           name="product_name"
           value={form.product_name}
           onChange={(e) =>
             setForm((p) => ({ ...p, product_name: e.target.value }))
           }
-          placeholder="Örn: Domates"
+          placeholder={t("productPlaceholder")}
           error={errors.product_name}
           required
         />
 
         <div className="grid grid-cols-2 gap-3">
           <Input
-            label="Miktar"
+            label={t("quantity")}
             name="quantity"
             type="number"
             min="0.01"
@@ -217,7 +224,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
             required
           />
           <Select
-            label="Birim"
+            label={t("unit")}
             name="unit"
             value={form.unit}
             onChange={(e) =>
@@ -231,7 +238,7 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
         </div>
 
         <Select
-          label="Kategori"
+          label={t("category")}
           name="category"
           value={form.category}
           onChange={(e) =>
@@ -242,12 +249,12 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
           }
           options={PRODUCT_CATEGORIES.map((c) => ({
             value: c,
-            label: c,
+            label: getCategoryLabel(c, tCategories),
           }))}
         />
 
         <Input
-          label="Son Kullanma Tarihi (SKT)"
+          label={t("expiration")}
           name="expiration_date"
           type="date"
           value={form.expiration_date}
@@ -257,17 +264,17 @@ export function InventoryForm({ onSubmit, initialBarcode }: InventoryFormProps) 
         />
 
         <Input
-          label="Barkod (isteğe bağlı)"
+          label={t("barcode")}
           name="barcode"
           value={form.barcode}
           onChange={(e) =>
             setForm((p) => ({ ...p, barcode: e.target.value }))
           }
-          placeholder="869..."
+          placeholder={t("barcodePlaceholder")}
         />
 
         <Button type="submit" fullWidth disabled={submitting} size="lg">
-          {submitting ? "Kaydediliyor..." : "Stoka Ekle"}
+          {submitting ? t("submitting") : t("submit")}
         </Button>
       </form>
     </div>

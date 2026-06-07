@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { UserPlus } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +11,7 @@ import { Card } from "@/components/ui/Card";
 
 export function RegisterForm() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const { signUp, signIn } = useAuth();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
@@ -23,7 +25,7 @@ export function RegisterForm() {
     setSubmitting(true);
 
     if (password.length < 6) {
-      setError("Şifre en az 6 karakter olmalı");
+      setError(t("passwordMinError"));
       setSubmitting(false);
       return;
     }
@@ -50,29 +52,29 @@ export function RegisterForm() {
     <Card padding="lg" className="shadow-md">
       <form onSubmit={(e) => void handleSubmit(e)} className="space-y-4">
         <Input
-          label="Ad Soyad"
+          label={t("fullName")}
           name="full_name"
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          placeholder="Adınız Soyadınız"
+          placeholder={t("fullNamePlaceholder")}
           required
         />
         <Input
-          label="E-posta"
+          label={t("email")}
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="ornek@email.com"
+          placeholder={t("emailPlaceholder")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
         />
         <Input
-          label="Şifre"
+          label={t("password")}
           name="password"
           type="password"
           autoComplete="new-password"
-          placeholder="En az 6 karakter"
+          placeholder={t("passwordMin")}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           minLength={6}
@@ -85,14 +87,11 @@ export function RegisterForm() {
           </p>
         )}
 
-        <p className="text-xs leading-relaxed text-navy-500">
-          Kayıt olarak kendi mutfak evinizi oluşturursunuz. Stok, tarif ve
-          alışveriş verileriniz güvenle bulutta saklanır.
-        </p>
+        <p className="text-xs leading-relaxed text-navy-500">{t("privacyNote")}</p>
 
         <Button type="submit" fullWidth size="lg" disabled={submitting}>
           <UserPlus className="h-4 w-4" />
-          {submitting ? "Hesap oluşturuluyor..." : "Ücretsiz Kayıt Ol"}
+          {submitting ? t("registerSubmitting") : t("registerSubmit")}
         </Button>
       </form>
     </Card>

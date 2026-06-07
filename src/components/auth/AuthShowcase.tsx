@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { Logo } from "@/components/brand/Logo";
 import {
   ChefHat,
@@ -6,25 +9,27 @@ import {
   Sparkles,
 } from "lucide-react";
 
-const features = [
-  {
-    icon: Package,
-    title: "Stok takibi",
-    description: "Buzdolabı ve mutfak ürünlerinizi tek yerden yönetin.",
-  },
-  {
-    icon: Sparkles,
-    title: "AI tarifler",
-    description: "Eldeki malzemelerle Gemini destekli tarif önerileri alın.",
-  },
-  {
-    icon: ShoppingCart,
-    title: "Alışveriş listesi",
-    description: "Eksikleri not edin, markete giderken yanınızda taşıyın.",
-  },
-];
-
 export function AuthShowcase() {
+  const t = useTranslations("auth");
+
+  const features = [
+    {
+      icon: Package,
+      title: t("featureStockTitle"),
+      description: t("featureStockDesc"),
+    },
+    {
+      icon: Sparkles,
+      title: t("featureRecipesTitle"),
+      description: t("featureRecipesDesc"),
+    },
+    {
+      icon: ShoppingCart,
+      title: t("featureShoppingTitle"),
+      description: t("featureShoppingDesc"),
+    },
+  ];
+
   return (
     <div className="relative hidden overflow-hidden bg-gradient-to-br from-forest-900 via-forest-800 to-navy-900 lg:flex lg:flex-col lg:justify-between lg:p-12">
       <div className="pointer-events-none absolute -left-20 top-20 h-72 w-72 rounded-full bg-plum-500/20 blur-3xl" />
@@ -34,11 +39,10 @@ export function AuthShowcase() {
         <Logo variant="light" markSize={48} />
 
         <h2 className="mt-10 max-w-md text-3xl font-bold leading-tight text-white">
-          Ne pişireceğinize karar verin.
+          {t("showcaseHeadline")}
         </h2>
         <p className="mt-4 max-w-md text-base leading-relaxed text-cream-200">
-          Eldeki malzemelerle AI tarifleri, stok takibi, SKT uyarıları ve
-          alışveriş listesi — hepsi tek uygulamada.
+          {t("showcaseDescription")}
         </p>
 
         <ul className="mt-8 space-y-4">

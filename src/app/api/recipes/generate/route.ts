@@ -22,11 +22,12 @@ export async function POST(request: Request) {
     }
 
     const items = parsed.data.items as InventoryItem[];
+    const locale = parsed.data.locale ?? "tr";
     const mockService = new MockRecipeService();
     const apiKey = normalizeGeminiKey(process.env.GEMINI_API_KEY);
 
     if (apiKey && !isValidGeminiKeyFormat(apiKey)) {
-      const fallback = await mockService.generate(items);
+      const fallback = await mockService.generate(items, locale);
       return NextResponse.json({
         ...fallback,
         source: "mock" as const,
@@ -36,11 +37,11 @@ export async function POST(request: Request) {
 
     if (apiKey) {
       try {
-        const result = await new GeminiRecipeService().generate(items);
+        const result = await new GeminiRecipeService().generate(items, locale);
         return NextResponse.json({ ...result, source: "gemini" as const });
       } catch (error) {
         if (isInvalidApiKeyError(error) || isQuotaError(error)) {
-          const fallback = await mockService.generate(items);
+          const fallback = await mockService.generate(items, locale);
           const warning = isQuotaError(error)
             ? "Gemini ücretsiz kotası dolmuş. Birkaç dakika bekleyin — şimdilik demo tarifler gösteriliyor."
             : "Gemini API key geçersiz. Demo tarifler gösteriliyor.";
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const result = await mockService.generate(items);
+    const result = await mockService.generate(items, locale);
     return NextResponse.json({ ...result, source: "mock" as const });
   } catch (error) {
     const message =

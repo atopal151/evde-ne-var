@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -14,6 +15,7 @@ interface AddShoppingItemFormProps {
 }
 
 export function AddShoppingItemForm({ onSubmit }: AddShoppingItemFormProps) {
+  const t = useTranslations("shopping");
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [unit, setUnit] = useState<InventoryUnit>("adet");
@@ -41,17 +43,17 @@ export function AddShoppingItemForm({ onSubmit }: AddShoppingItemFormProps) {
   return (
     <form onSubmit={(e) => void handleSubmit(e)} className="space-y-3">
       <Input
-        label="Ürün"
+        label={t("productLabel")}
         name="product_name"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Örn: Domates"
+        placeholder={t("productPlaceholder")}
         required
       />
 
       <div className="grid grid-cols-2 gap-3">
         <Input
-          label="Miktar"
+          label={t("quantityLabel")}
           name="quantity"
           type="number"
           min="0.01"
@@ -60,7 +62,7 @@ export function AddShoppingItemForm({ onSubmit }: AddShoppingItemFormProps) {
           onChange={(e) => setQuantity(e.target.value)}
         />
         <Select
-          label="Birim"
+          label={t("unitLabel")}
           name="unit"
           value={unit}
           onChange={(e) => setUnit(e.target.value as InventoryUnit)}
@@ -70,7 +72,7 @@ export function AddShoppingItemForm({ onSubmit }: AddShoppingItemFormProps) {
 
       <Button type="submit" fullWidth disabled={submitting || !name.trim()}>
         <Plus className="h-4 w-4" />
-        {submitting ? "Ekleniyor..." : "Listeye Ekle"}
+        {submitting ? t("adding") : t("addToList")}
       </Button>
     </form>
   );

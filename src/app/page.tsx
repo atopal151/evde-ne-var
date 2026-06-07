@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import { AlertTriangle, Package, Plus, RefreshCw } from "lucide-react";
 import { useAuth } from "@/components/auth/AuthProvider";
 import { AppShell } from "@/components/layout/AppShell";
@@ -14,6 +15,8 @@ import { getExpirationInfo } from "@/lib/utils/expiration";
 
 export default function HomePage() {
   const router = useRouter();
+  const t = useTranslations("home");
+  const tCommon = useTranslations("common");
   const { user, loading: authLoading, isMockMode } = useAuth();
   const { items, loading, error, refresh, removeItem, authLoading: inventoryAuthLoading } =
     useInventory();
@@ -36,18 +39,17 @@ export default function HomePage() {
   const isLoading = loading || authLoading || inventoryAuthLoading;
 
   return (
-    <AppShell subtitle="Stoklarınız ve tarif önerileriniz">
-
+    <AppShell subtitle={t("subtitle")}>
       {!isLoading && items.length > 0 && (
         <div className="mb-6 grid grid-cols-2 gap-3">
           <StatCard
-            label="Toplam ürün"
+            label={t("totalProducts")}
             value={items.length}
             icon={Package}
             tone="forest"
           />
           <StatCard
-            label="SKT uyarısı"
+            label={t("expirationWarning")}
             value={urgentCount}
             icon={AlertTriangle}
             tone={urgentCount > 0 ? "orange" : "plum"}
@@ -56,9 +58,11 @@ export default function HomePage() {
       )}
 
       <PageSection
-        title="Stoklarım"
+        title={t("myStock")}
         subtitle={
-          isLoading ? "Yükleniyor..." : `${items.length} ürün takip ediliyor`
+          isLoading
+            ? tCommon("loading")
+            : t("trackingCount", { count: items.length })
         }
         actions={
           <>
@@ -66,13 +70,13 @@ export default function HomePage() {
               variant="ghost"
               size="sm"
               onClick={() => void refresh()}
-              aria-label="Yenile"
+              aria-label={tCommon("refresh")}
             >
               <RefreshCw className="h-4 w-4" />
             </Button>
             <Button size="sm" onClick={() => router.push("/inventory/add")}>
               <Plus className="h-4 w-4" />
-              Ekle
+              {tCommon("add")}
             </Button>
           </>
         }
@@ -87,10 +91,7 @@ export default function HomePage() {
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="h-24 rounded-2xl skeleton-shimmer"
-            />
+            <div key={i} className="h-24 rounded-2xl skeleton-shimmer" />
           ))}
         </div>
       ) : (
@@ -100,7 +101,7 @@ export default function HomePage() {
           emptyAction={
             <Button onClick={() => router.push("/inventory/add")}>
               <Plus className="h-4 w-4" />
-              İlk ürünü ekle
+              {t("addFirstProduct")}
             </Button>
           }
         />

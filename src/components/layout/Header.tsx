@@ -1,6 +1,8 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { LogoMark } from "@/components/brand/Logo";
 import { AuthHeaderActions } from "@/components/auth/AuthHeaderActions";
-import { APP_NAME, APP_TAGLINE } from "@/lib/brand";
 
 interface HeaderProps {
   title?: string;
@@ -8,12 +10,11 @@ interface HeaderProps {
   badge?: string;
 }
 
-export function Header({
-  title = APP_NAME,
-  subtitle = APP_TAGLINE,
-  badge,
-}: HeaderProps) {
-  const isHome = title === APP_NAME;
+export function Header({ title, subtitle, badge }: HeaderProps) {
+  const t = useTranslations("brand");
+  const resolvedTitle = title ?? t("appName");
+  const resolvedSubtitle = subtitle ?? t("tagline");
+  const isHome = !title;
 
   return (
     <header className="relative overflow-hidden bg-gradient-to-br from-forest-900 via-forest-800 to-navy-900 px-4 pb-10 pt-6 text-white sm:px-6">
@@ -32,7 +33,7 @@ export function Header({
                 isHome ? "text-lg sm:text-xl" : "text-xl sm:text-2xl",
               ].join(" ")}
             >
-              {title}
+              {resolvedTitle}
             </h1>
             {badge && (
               <span className="rounded-full border border-white/10 bg-plum-600/70 px-2.5 py-0.5 text-xs font-medium backdrop-blur-sm">
@@ -40,7 +41,9 @@ export function Header({
               </span>
             )}
           </div>
-          <p className="mt-0.5 truncate text-sm text-cream-200/90">{subtitle}</p>
+          <p className="mt-0.5 truncate text-sm text-cream-200/90">
+            {resolvedSubtitle}
+          </p>
         </div>
 
         <AuthHeaderActions />

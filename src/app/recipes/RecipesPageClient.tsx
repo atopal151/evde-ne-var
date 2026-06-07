@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChefHat, Sparkles } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { RecipeIllustration } from "@/components/illustrations/KitchenIllustrations";
@@ -17,6 +18,7 @@ import { resolveIngredientDeductions } from "@/lib/recipes/matchIngredients";
 import type { Recipe } from "@/types/recipes";
 
 export function RecipesPageClient() {
+  const t = useTranslations("recipes");
   const { items, loading: inventoryLoading, deductIngredients } =
     useInventory();
   const { entries, lastBatchAt, maxHistory, hydrated, loading, error, warning, generate } =
@@ -47,7 +49,7 @@ export function RecipesPageClient() {
           .filter((d) => d.matched && d.amount > 0)
           .map((d) => ({ inventoryId: d.inventoryId, amount: d.amount }))
       );
-      setSuccessMessage(`${cookedRecipe.name} pişirildi — stok güncellendi.`);
+      setSuccessMessage(t("cookedSuccess", { name: cookedRecipe.name }));
       setCookedRecipe(null);
       setSelectedRecipe(null);
     } catch (e) {
@@ -58,19 +60,20 @@ export function RecipesPageClient() {
   };
 
   return (
-    <AppShell
-      title="Tarifler"
-      subtitle="Eldeki malzemelerle AI destekli öneriler"
-    >
+    <AppShell title={t("title")} subtitle={t("subtitle")}>
       <div className="mb-6 space-y-4">
         <PageSection
-          title="Tarif Öner"
+          title={t("suggestTitle")}
           subtitle={
             inventoryLoading
-              ? "Stok yükleniyor..."
+              ? t("inventoryLoading")
               : entries.length > 0
-                ? `${entries.length}/${maxHistory} kayıtlı tarif · ${items.length} malzeme`
-                : `${items.length} malzeme ile tarif üret`
+                ? t("summaryWithRecipes", {
+                    count: entries.length,
+                    max: maxHistory,
+                    ingredients: items.length,
+                  })
+                : t("summaryNoRecipes", { ingredients: items.length })
           }
           icon={ChefHat}
           actions={
@@ -80,7 +83,7 @@ export function RecipesPageClient() {
               disabled={loading || inventoryLoading || items.length === 0}
             >
               <Sparkles className="h-4 w-4" />
-              {loading ? "Üretiliyor..." : "Tarif Öner"}
+              {loading ? t("generating") : t("generate")}
             </Button>
           }
         />
@@ -88,8 +91,8 @@ export function RecipesPageClient() {
         {items.length === 0 && !inventoryLoading && (
           <EmptyState
             illustration={<RecipeIllustration className="h-32 w-32" />}
-            title="Stok boş"
-            description="Tarif almak için önce malzeme ekleyin. Stok sayfasından hızlıca ürün girebilirsiniz."
+            title={t("emptyStockTitle")}
+            description={t("emptyStockDescription")}
           />
         )}
 
@@ -139,7 +142,7 @@ export function RecipesPageClient() {
           </ul>
           {loading && (
             <p className="mt-4 text-center text-sm text-navy-500">
-              Yeni tarifler üretiliyor…
+              {t("generatingMore")}
             </p>
           )}
         </div>
@@ -148,12 +151,12 @@ export function RecipesPageClient() {
         items.length > 0 && (
           <EmptyState
             illustration={<RecipeIllustration className="h-36 w-36" />}
-            title="Henüz tarif üretilmedi"
-            description='"Tarif Öner" ile eldeki malzemelere göre 3 tarif alın.'
+            title={t("emptyRecipesTitle")}
+            description={t("emptyRecipesDescription")}
             action={
               <Button onClick={handleGenerate} disabled={loading}>
                 <Sparkles className="h-4 w-4" />
-                Tarif Öner
+                {t("generate")}
               </Button>
             }
           />

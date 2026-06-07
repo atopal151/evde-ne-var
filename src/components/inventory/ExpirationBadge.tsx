@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslations } from "next-intl";
 import { getExpirationInfo } from "@/lib/utils/expiration";
 
 interface ExpirationBadgeProps {
@@ -13,7 +16,10 @@ const statusStyles = {
 };
 
 export function ExpirationBadge({ expirationDate }: ExpirationBadgeProps) {
-  const info = getExpirationInfo(expirationDate);
+  const t = useTranslations("common.expiration");
+  const info = getExpirationInfo(expirationDate, (key, values) =>
+    t(key, values ?? {})
+  );
 
   return (
     <span
