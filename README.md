@@ -74,8 +74,8 @@ Ana sayfada **yeşil "Supabase bağlı"** banner'ı görünmeli; badge **Bulut**
 ## Aile Paylaşımı (Ortak Alışveriş Listesi)
 
 1. SQL Editor'de `006`, `007` ve `008` migration dosyalarını çalıştırın (004 ve 005 sonrası)
-2. Alışveriş Listesi sayfasından eşinizin e-postasını davet edin
-3. Karşı taraf giriş yapınca **Gelen davetler** bölümünden **Kabul Et** der
+2. **Ayarlar** sayfasından eşinizin e-postasını davet edin
+3. Karşı taraf giriş yapınca **Ayarlar → Gelen davetler** bölümünden **Kabul Et** der
 4. Realtime sayesinde eklenen ürünler anında her iki tarafta güncellenir
 
 ## Auth Kurulumu

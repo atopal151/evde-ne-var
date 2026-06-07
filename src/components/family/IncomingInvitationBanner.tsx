@@ -13,7 +13,7 @@ export function IncomingInvitationBanner() {
 
   return (
     <Link
-      href="/shopping"
+      href="/settings"
       className="mb-4 flex items-center gap-3 rounded-2xl border border-plum-300/80 bg-gradient-to-r from-plum-50 to-forest-50 px-4 py-3 text-sm shadow-sm transition-shadow hover:shadow-md"
     >
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-plum-600 text-white">
@@ -24,7 +24,7 @@ export function IncomingInvitationBanner() {
           {incoming.length} mutfak daveti bekliyor
         </p>
         <p className="text-xs text-navy-500">
-          Alışveriş listesi sayfasından kabul edebilirsiniz
+          Ayarlar sayfasından kabul edebilirsiniz
         </p>
       </div>
       <span className="shrink-0 rounded-full bg-plum-600 px-2.5 py-1 text-xs font-bold text-white">

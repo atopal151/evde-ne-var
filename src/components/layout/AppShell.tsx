@@ -21,7 +21,7 @@ export function AppShell({
   hideHeader,
 }: AppShellProps) {
   const pathname = usePathname();
-  const showInvitationBanner = pathname !== "/shopping";
+  const showInvitationBanner = pathname !== "/settings";
 
   return (
     <div className="app-bg flex min-h-full flex-col">
