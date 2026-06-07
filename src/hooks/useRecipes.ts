@@ -1,54 +1,95 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useAuth } from "@/components/auth/AuthProvider";
+import {
+  appendRecipesToHistory,
+  clearRecipeHistory,
+  loadRecipeHistory,
+  MAX_RECIPE_HISTORY,
+  saveRecipeHistory,
+  type StoredRecipe,
+} from "@/lib/recipes/recipeHistory";
 import type { InventoryItem } from "@/types/database";
-import type { Recipe, RecipeResponse } from "@/types/recipes";
+import type { RecipeResponse } from "@/types/recipes";
 
 export function useRecipes() {
-  const [recipes, setRecipes] = useState<Recipe[]>([]);
+  const { user } = useAuth();
+  const scope = user?.id ?? "guest";
+
+  const [entries, setEntries] = useState<StoredRecipe[]>([]);
+  const [hydrated, setHydrated] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [warning, setWarning] = useState<string | null>(null);
   const [source, setSource] = useState<"gemini" | "mock" | null>(null);
 
-  const generate = useCallback(async (items: InventoryItem[]) => {
-    setLoading(true);
-    setError(null);
-    setWarning(null);
-    setSource(null);
+  useEffect(() => {
+    const history = loadRecipeHistory(scope);
+    setEntries(history.entries);
+    setSource(history.lastSource ?? null);
+    setWarning(history.lastWarning ?? null);
+    setHydrated(true);
+  }, [scope]);
 
-    try {
-      const response = await fetch("/api/recipes/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items }),
-      });
+  const generate = useCallback(
+    async (items: InventoryItem[]) => {
+      setLoading(true);
+      setError(null);
+      setWarning(null);
 
-      const data = (await response.json()) as RecipeResponse & {
-        error?: string;
-      };
+      try {
+        const response = await fetch("/api/recipes/generate", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ items }),
+        });
 
-      if (!response.ok) {
-        throw new Error(data.error ?? "Tarifler oluşturulamadı");
+        const data = (await response.json()) as RecipeResponse & {
+          error?: string;
+        };
+
+        if (!response.ok) {
+          throw new Error(data.error ?? "Tarifler oluşturulamadı");
+        }
+
+        const current = loadRecipeHistory(scope);
+        const updated = appendRecipesToHistory(current, data.recipes, {
+          source: data.source,
+          warning: data.warning ?? null,
+        });
+
+        saveRecipeHistory(scope, updated);
+        setEntries(updated.entries);
+        if (data.warning) setWarning(data.warning);
+        if (data.source) setSource(data.source);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Tarifler oluşturulamadı");
+      } finally {
+        setLoading(false);
       }
-
-      setRecipes(data.recipes);
-      if (data.warning) setWarning(data.warning);
-      if (data.source) setSource(data.source);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Tarifler oluşturulamadı");
-      setRecipes([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [scope]
+  );
 
   const clear = useCallback(() => {
-    setRecipes([]);
+    clearRecipeHistory(scope);
+    setEntries([]);
     setError(null);
     setWarning(null);
     setSource(null);
-  }, []);
+  }, [scope]);
 
-  return { recipes, loading, error, warning, source, generate, clear };
+  return {
+    entries,
+    recipes: entries.map((entry) => entry.recipe),
+    maxHistory: MAX_RECIPE_HISTORY,
+    hydrated,
+    loading,
+    error,
+    warning,
+    source,
+    generate,
+    clear,
+  };
 }

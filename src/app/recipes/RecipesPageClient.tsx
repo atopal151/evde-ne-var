@@ -22,7 +22,8 @@ export function RecipesPageClient() {
     useGeminiStatus();
   const { items, loading: inventoryLoading, deductIngredients } =
     useInventory();
-  const { recipes, loading, error, warning, source, generate } = useRecipes();
+  const { entries, maxHistory, hydrated, loading, error, warning, source, generate } =
+    useRecipes();
 
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
   const [cookedRecipe, setCookedRecipe] = useState<Recipe | null>(null);
@@ -73,7 +74,9 @@ export function RecipesPageClient() {
           subtitle={
             inventoryLoading
               ? "Stok yükleniyor..."
-              : `${items.length} malzeme ile tarif üret`
+              : entries.length > 0
+                ? `${entries.length}/${maxHistory} kayıtlı tarif · ${items.length} malzeme`
+                : `${items.length} malzeme ile tarif üret`
           }
           icon={ChefHat}
           actions={
@@ -96,13 +99,13 @@ export function RecipesPageClient() {
           />
         )}
 
-        {source === "gemini" && recipes.length > 0 && (
+        {source === "gemini" && entries.length > 0 && (
           <div className="rounded-2xl border border-forest-200/60 bg-gradient-to-r from-forest-50 to-emerald-50/40 px-4 py-3 text-sm text-forest-800">
             ✨ Son tarifler Gemini AI ile üretildi.
           </div>
         )}
 
-        {source === "mock" && recipes.length > 0 && !warning && (
+        {source === "mock" && entries.length > 0 && !warning && (
           <div className="rounded-2xl border border-cream-300 bg-cream-100/80 px-4 py-3 text-sm text-navy-700">
             Son tarifler demo modda üretildi (API key yok veya geçersiz).
           </div>
@@ -127,20 +130,40 @@ export function RecipesPageClient() {
         )}
       </div>
 
-      {loading ? (
+      {!hydrated ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="h-24 rounded-2xl skeleton-shimmer" />
           ))}
         </div>
-      ) : recipes.length > 0 ? (
-        <ul className="space-y-3">
-          {recipes.map((recipe) => (
-            <li key={recipe.name}>
-              <RecipeCard recipe={recipe} onSelect={setSelectedRecipe} />
-            </li>
+      ) : loading && entries.length === 0 ? (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-24 rounded-2xl skeleton-shimmer" />
           ))}
-        </ul>
+        </div>
+      ) : entries.length > 0 ? (
+        <div>
+          <p className="mb-3 text-sm text-navy-500">
+            En eski tarif üstte — yeni üretimler listeye eklenir (en fazla{" "}
+            {maxHistory}).
+          </p>
+          <ul className="space-y-3">
+            {entries.map((entry) => (
+              <li key={entry.id}>
+                <RecipeCard
+                  recipe={entry.recipe}
+                  onSelect={setSelectedRecipe}
+                />
+              </li>
+            ))}
+          </ul>
+          {loading && (
+            <p className="mt-4 text-center text-sm text-navy-500">
+              Yeni tarifler üretiliyor…
+            </p>
+          )}
+        </div>
       ) : (
         !error &&
         items.length > 0 && (

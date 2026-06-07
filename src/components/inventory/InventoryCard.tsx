@@ -40,7 +40,7 @@ export function InventoryCard({ item, onDelete }: InventoryCardProps) {
             <button
               type="button"
               onClick={() => onDelete(item.id)}
-              className="rounded-xl p-2 text-navy-400 opacity-0 transition-all hover:bg-red-50 hover:text-red-600 group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200"
+              className="shrink-0 rounded-xl p-2 text-navy-400 transition-colors hover:bg-red-50 hover:text-red-600 active:bg-red-100 active:text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-200"
               aria-label={`${item.product_name} sil`}
             >
               <Trash2 className="h-4 w-4" />
