@@ -40,6 +40,8 @@ Dashboard → **SQL Editor** → sırayla çalıştırın:
 | `supabase/setup_all.sql` | Tablolar + RLS + Realtime + demo ev (tek seferde) |
 | `supabase/migrations/004_auth_rls.sql` | Auth + kullanıcı bazlı RLS |
 | `supabase/migrations/005_ensure_profile.sql` | Profil/ev otomatik oluşturma |
+| `supabase/migrations/006_family_sharing.sql` | Aile daveti, onay, ortak liste |
+| `supabase/migrations/006_family_sharing.sql` | Aile daveti, onay, ortak liste |
 
 ### 3. API anahtarları
 
@@ -68,9 +70,23 @@ npm run dev
 
 Ana sayfada **yeşil "Supabase bağlı"** banner'ı görünmeli; badge **Bulut** olur.
 
+## Aile Paylaşımı (Ortak Alışveriş Listesi)
+
+1. SQL Editor'de `006_family_sharing.sql` çalıştırın (004 ve 005 sonrası)
+2. Alışveriş Listesi sayfasından eşinizin e-postasını davet edin
+3. Karşı taraf giriş yapıp **Kabul Et** dediğinde aynı listeyi görür
+4. Realtime sayesinde eklenen ürünler anında her iki tarafta güncellenir
+
+## Aile Paylaşımı (Ortak Alışveriş Listesi)
+
+1. SQL Editor'de `006_family_sharing.sql` çalıştırın
+2. Alışveriş Listesi sayfasından eşinizin e-postasını davet edin
+3. Karşı taraf giriş yapınca **Kabul Et** der; liste ve stok ortaklaşır
+4. Realtime sayesinde eklenen ürünler anında her iki tarafta görünür
+
 ## Auth Kurulumu
 
-1. SQL Editor'de `004_auth_rls.sql` ve `005_ensure_profile.sql` çalıştırın
+1. SQL Editor'de `004_auth_rls.sql`, `005_ensure_profile.sql` ve `006_family_sharing.sql` çalıştırın
 2. Dashboard → **Authentication** → **Providers** → Email açık olsun
 3. Geliştirme için: **Confirm email** kapalı (hızlı test)
 4. Uygulamayı yeniden başlatın → `/register` ile hesap oluşturun

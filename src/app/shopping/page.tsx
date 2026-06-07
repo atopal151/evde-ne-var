@@ -3,6 +3,7 @@
 import { RefreshCw, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { ShoppingIllustration } from "@/components/illustrations/KitchenIllustrations";
+import { FamilySharingCard } from "@/components/family/FamilySharingCard";
 import { AddShoppingItemForm } from "@/components/shopping/AddShoppingItemForm";
 import { ShoppingListRow } from "@/components/shopping/ShoppingListRow";
 import { Button } from "@/components/ui/Button";
@@ -27,8 +28,10 @@ export default function ShoppingPage() {
   return (
     <AppShell
       title="Alışveriş Listesi"
-      subtitle="Eksik malzemeleri takip edin"
+      subtitle="Ailenizle ortak liste — eksik malzemeleri takip edin"
     >
+      <FamilySharingCard />
+
       <PageSection
         title="Listem"
         subtitle={
