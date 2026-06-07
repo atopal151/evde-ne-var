@@ -148,7 +148,7 @@ export async function lookupBarcodeOnline(
     const response = await fetch(
       `https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(normalized)}.json`,
       {
-        headers: { "User-Agent": "BugunNePisirsem/1.0 (kitchen inventory app)" },
+        headers: { "User-Agent": "Nepisirsem/1.0 (kitchen inventory app)" },
         next: { revalidate: 86400 },
       }
     );

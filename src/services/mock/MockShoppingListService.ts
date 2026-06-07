@@ -4,7 +4,7 @@ import type {
   IShoppingListService,
 } from "@/services/interfaces/IShoppingListService";
 
-const STORAGE_KEY = "evde-ne-var-shopping";
+const STORAGE_KEY = "nepisirsem-shopping";
 
 function load(): ShoppingListItem[] {
   if (typeof window === "undefined") return [];

@@ -1,4 +1,4 @@
--- Evde Ne Var? — İlk veritabanı şeması
+-- Ne Pişirsem? — İlk veritabanı şeması
 -- Supabase SQL Editor veya CLI ile çalıştırın
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";

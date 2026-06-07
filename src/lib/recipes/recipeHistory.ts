@@ -2,7 +2,7 @@ import type { Recipe } from "@/types/recipes";
 
 export const MAX_RECIPE_HISTORY = 10;
 
-export const RECIPE_HISTORY_STORAGE_PREFIX = "bugun-ne-pisirsem-recipe-history";
+export const RECIPE_HISTORY_STORAGE_PREFIX = "nepisirsem-recipe-history";
 
 export interface StoredRecipe {
   id: string;

@@ -1,9 +1,9 @@
 ---
-description: Evde Ne Var? proje mimarisi ve kod standartları
+description: Ne Pişirsem? proje mimarisi ve kod standartları
 alwaysApply: true
 ---
 
-# Evde Ne Var? — Mimari Kurallar
+# Ne Pişirsem? — Mimari Kurallar
 
 ## Proje Özeti
 Akıllı mutfak/buzdolabı asistanı: stok yönetimi, SKT takibi, Gemini ile tarif üretimi.

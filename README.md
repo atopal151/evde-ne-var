@@ -1,4 +1,4 @@
-# Bugün Ne Pişirsem?
+# Ne Pişirsem?
 
 Eldeki malzemelerle AI destekli tarif önerileri — stok yönetimi, SKT takibi ve akıllı alışveriş listesi.
 
@@ -14,7 +14,7 @@ Eldeki malzemelerle AI destekli tarif önerileri — stok yönetimi, SKT takibi 
 ## Hızlı Başlangıç
 
 ```bash
-cd bugun-ne-pisirsem   # veya mevcut klasör adınız
+cd nepisirsem
 cp .env.example .env.local
 npm install
 npm run dev

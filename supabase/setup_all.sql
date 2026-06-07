@@ -1,4 +1,4 @@
--- Evde Ne Var? — Tüm kurulum (Supabase SQL Editor'de TEK SEFERDE çalıştırın)
+-- Ne Pişirsem? — Tüm kurulum (Supabase SQL Editor'de TEK SEFERDE çalıştırın)
 -- Dosya: supabase/setup_all.sql
 
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";

@@ -34,7 +34,7 @@ export function AuthShowcase() {
         <Logo variant="light" markSize={48} />
 
         <h2 className="mt-10 max-w-md text-3xl font-bold leading-tight text-white">
-          Bugün ne pişireceğinize karar verin.
+          Ne pişireceğinize karar verin.
         </h2>
         <p className="mt-4 max-w-md text-base leading-relaxed text-cream-200">
           Eldeki malzemelerle AI tarifleri, stok takibi, SKT uyarıları ve

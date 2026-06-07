@@ -5,7 +5,7 @@ import type {
 } from "@/types/database";
 import type { IInventoryService } from "@/services/interfaces/IInventoryService";
 
-const STORAGE_KEY = "evde-ne-var-inventory";
+const STORAGE_KEY = "nepisirsem-inventory";
 
 function load(): InventoryItem[] {
   if (typeof window === "undefined") return [];
